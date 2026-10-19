@@ -1,0 +1,12 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import{checkStockSales,checkTransfers,checkMargin}from'../src/rules.js';import{processFacts}from'../src/process.js';
+test('stock shortfall is flagged above both thresholds',()=>{const f=checkStockSales({opening:5,restocked:0,closing:3,ingredientPerPlate:.02,priceKobo:150000,recordedSalesKobo:12000000});assert.equal(f.rule,'stock_sales');assert.equal(f.gapKobo,3000000)});
+test('stock discrepancy below absolute threshold is not flagged',()=>assert.equal(checkStockSales({opening:1,restocked:0,closing:0,ingredientPerPlate:1,priceKobo:100000,recordedSalesKobo:90000}),null));
+test('negative inventory is rejected',()=>assert.throws(()=>checkStockSales({opening:1,restocked:0,closing:2,ingredientPerPlate:1,priceKobo:100000,recordedSalesKobo:0})));
+test('verified transfers less than staff report',()=>assert.equal(checkTransfers({recordedTransferKobo:1200000,verifiedPaystackKobo:850000}).signedGapKobo,-350000));
+test('verified transfers greater than staff report',()=>assert.equal(checkTransfers({recordedTransferKobo:850000,verifiedPaystackKobo:1200000}).signedGapKobo,350000));
+test('transfer gap exactly threshold not flagged',()=>assert.equal(checkTransfers({recordedTransferKobo:200000,verifiedPaystackKobo:0}),null));
+test('margin recommendation is rounded up to ₦50',()=>{const f=checkMargin({priceKobo:150000,ingredientCostsKobo:[120000]});assert.equal(f.proposedPriceKobo,185000);assert.equal(f.margin,.2)});
+test('healthy margin is not flagged',()=>assert.equal(checkMargin({priceKobo:150000,ingredientCostsKobo:[40000]}),null));
+test('invalid kobo is rejected',()=>assert.throws(()=>checkMargin({priceKobo:1.5,ingredientCostsKobo:[1]})));
+test('missing verified Paystack evidence is skipped rather than treated as zero',()=>{const x=processFacts({margin:{priceKobo:150000,ingredientCostsKobo:[120000]}});assert.equal(x.flags.length,1);assert.equal(x.skipped.length,2);assert.equal(x.skipped[0].reason,'insufficient_evidence')});
