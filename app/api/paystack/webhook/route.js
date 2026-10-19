@@ -1,0 +1,1 @@
+import {NextResponse} from 'next/server';export function POST(){return NextResponse.json({error:'Verified Paystack processing not enabled'},{status:503})}
