@@ -11,11 +11,12 @@
     "build": "next build",
     "start": "next start",
     "test": "node --test",
-    "check": "node --check src/rules.js && node --check src/process.js"
+    "check": "node --check src/rules.js && node --check src/process.js && node --check src/ingest-schema.js && node --check src/token-auth.js"
   },
   "dependencies": {
     "next": "15.5.9",
     "react": "19.1.2",
-    "react-dom": "19.1.2"
+    "react-dom": "19.1.2",
+    "@neondatabase/serverless": "1.0.2"
   }
 }
