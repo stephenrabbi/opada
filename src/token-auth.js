@@ -1,0 +1,2 @@
+import {createHash} from 'node:crypto';
+export function tokenDigest(header){if(typeof header!=='string'||!header.startsWith('Bearer '))return null;const token=header.slice(7);if(!/^[A-Za-z0-9_-]{32,256}$/.test(token))return null;return createHash('sha256').update(token).digest('hex')}
