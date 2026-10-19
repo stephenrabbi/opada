@@ -1,0 +1,1 @@
+import {NextResponse} from 'next/server';export function GET(){return NextResponse.json({service:'opada',mode:'demo',liveFinancialProcessing:false,databaseConfigured:!!process.env.DATABASE_URL})}
