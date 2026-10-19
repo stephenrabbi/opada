@@ -1,13 +1,21 @@
 {
   "name": "opada",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
     "test": "node --test",
     "check": "node --check src/rules.js && node --check src/process.js"
   },
-  "engines": {
-    "node": ">=22"
+  "dependencies": {
+    "next": "15.5.9",
+    "react": "19.1.2",
+    "react-dom": "19.1.2"
   }
 }
