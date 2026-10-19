@@ -1,0 +1,1 @@
+import {NextResponse} from 'next/server';export function POST(){return NextResponse.json({error:'Authenticated ingestion not enabled in this release'},{status:503})}
