@@ -72,3 +72,39 @@
 .opada-record-card small{color:#687970;font-size:12px}
 .opada-record-card code{color:#65766c;font-size:11px;overflow-wrap:anywhere}
 @media(max-width:700px){.opada-mobile-records{display:grid;gap:10px}.opada-owner .opada-data-scroller{display:none}.opada-record-top b{font-size:16px;color:#183f31}}
+
+/* Figma alignment and WCAG AA contrast correction; single authoritative palette */
+:root{--opada-ink:#142c2a;--opada-secondary:#42564d;--opada-forest:#102c34;--opada-primary:#126549;--opada-paper:#f7f5f0;--opada-line:#ced8d0;--opada-white:#fff}
+.opada-owner,.opada-staff{color:var(--opada-ink)!important;background:var(--opada-paper)!important}
+.opada-owner p,.opada-staff p{color:var(--opada-secondary)}
+.opada-owner small,.opada-staff small{color:#43574e}
+.opada-owner label,.opada-staff label{color:#1d3832}
+.opada-owner input,.opada-staff input,.opada-staff select,.opada-staff textarea{color:#17332b!important;background:#fff!important;border:1.5px solid #7e9589!important}
+.opada-owner input::placeholder,.opada-staff input::placeholder,.opada-staff textarea::placeholder{color:#526359!important;opacity:1}
+.opada-owner>header p,.opada-owner>header a,.opada-staff-hero p,.opada-staff-hero a{color:#effcf5!important}
+.opada-owner .opada-metric span,.opada-owner .opada-metric small{color:#40544b}
+.opada-owner .opada-overline{color:#126549}
+.opada-owner .opada-status-count{color:#154f34;background:#e2f3e8}
+.opada-pill-amber{color:#754000;background:#fff0c7;border-color:#d6ad57}
+.opada-pill-green{color:#145533;background:#def4e5;border-color:#a1d6b5}
+.opada-pill-neutral{color:#384950;background:#edf1f4;border-color:#b9c9d0}
+.opada-owner .opada-data-scroller th{color:#294a3b!important}
+.opada-owner .opada-data-scroller td{color:#1c302b!important}
+.opada-owner .opada-record-card p,.opada-owner .opada-record-card small,.opada-owner .opada-record-card code{color:#3f554a}
+.opada-staff .opada-form-head p{color:#42564c}
+.opada-owner .opada-side-nav{display:none}
+@media(min-width:1100px){
+ .opada-owner.opada-figma-shell{position:relative;max-width:1440px!important;min-height:100vh;margin:0 auto!important;padding:25px 30px 70px 292px!important}
+ .opada-owner .opada-side-nav{display:flex;position:absolute;top:0;left:0;bottom:0;width:262px;background:#102c34;color:#fff;flex-direction:column;padding:29px 17px;gap:54px;z-index:2}
+ .opada-brand{padding:0 15px;font-size:34px;font-weight:850;letter-spacing:-1.5px;line-height:1.2;color:#fff}
+ .opada-brand span{color:#e4b14c}
+ .opada-brand small{display:block;font-size:10px;letter-spacing:1.3px;color:#d0e5df;font-weight:700;margin-top:13px}
+ .opada-side-items{display:flex;flex-direction:column;gap:7px}
+ .opada-side-items button,.opada-side-items a{color:#eefaf5!important;border:0;background:transparent!important;text-align:left;text-decoration:none;font-size:15px;font-weight:650;padding:14px 17px;border-radius:11px;display:flex;gap:16px;align-items:center;cursor:pointer}
+ .opada-side-items button.active,.opada-side-items button:hover,.opada-side-items a:hover{background:#205044!important;color:#fff!important}
+ .opada-side-items button span{font-size:19px;color:#fff}
+ .opada-side-foot{color:#d0e5df!important;margin-top:auto;padding:0 14px;font-size:10px;letter-spacing:1px}
+ .opada-owner nav.opada-tabs,.opada-owner .opada-mobile-switch{display:none!important}
+ .opada-owner>header{min-height:130px}
+}
+@media(max-width:1099px){.opada-owner .opada-side-nav{display:none!important}}
