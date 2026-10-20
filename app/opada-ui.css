@@ -62,3 +62,13 @@
  .opada-data-scroller{margin:0 -3px}
  .opada-section-heading{align-items:center}
 }
+
+/* Mobile-first record cards: no horizontal table navigation on phones */
+.opada-mobile-records{display:none}
+.opada-record-card{padding:16px;border:1px solid #e1e9e3;background:#fff;border-radius:14px;display:grid;gap:9px;overflow-wrap:anywhere;box-shadow:0 4px 12px #173e3410}
+.opada-record-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.opada-record-top strong{color:#193a31;font-size:18px;letter-spacing:-.02em}
+.opada-record-card p{margin:0;color:#52665b;font-size:13px}
+.opada-record-card small{color:#687970;font-size:12px}
+.opada-record-card code{color:#65766c;font-size:11px;overflow-wrap:anywhere}
+@media(max-width:700px){.opada-mobile-records{display:grid;gap:10px}.opada-owner .opada-data-scroller{display:none}.opada-record-top b{font-size:16px;color:#183f31}}
