@@ -12,8 +12,8 @@ export async function POST(request){
  const business=await auth.sql`SELECT name FROM businesses WHERE id=${auth.staff.business_id} LIMIT 1`;
  if(!business.length||!business[0].name.startsWith('OPADA SYNTHETIC'))return NextResponse.json({error:'Test checkout restricted to synthetic business'},{status:403});
  const reference=checkoutReference();
- await auth.sql`INSERT INTO paystack_expected_references(reference,business_id,expected_amount_kobo,currency) VALUES (${reference},${auth.staff.business_id},${body.amount_kobo},'NGN')`;
- const checkout=await initializeTestPayment({...body,reference},secret);
+ try{await auth.sql`INSERT INTO paystack_expected_references(reference,business_id,expected_amount_kobo,currency) VALUES (${reference},${auth.staff.business_id},${body.amount_kobo},'NGN')`}catch{return NextResponse.json({error:'Checkout unavailable',code:'TEST_REFERENCE_STORAGE_FAILED'},{status:503})}
+ let checkout;try{checkout=await initializeTestPayment({...body,reference},secret)}catch{return NextResponse.json({error:'Checkout unavailable',code:'PAYSTACK_TEST_INITIALIZATION_FAILED'},{status:503})}
  return NextResponse.json({mode:'test',...checkout},{headers:{'Cache-Control':'no-store'}});
- }catch{return NextResponse.json({error:'Could not initialize test checkout'},{status:503})}
+ }catch{return NextResponse.json({error:'Checkout unavailable',code:'TEST_BUSINESS_LOOKUP_FAILED'},{status:503})}
 }
