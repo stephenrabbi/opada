@@ -56,6 +56,30 @@ try{
     await page.getByRole('textbox',{name:'Filter transactions'}).fill('jollof');
     await page.locator(width<=620?'.opada-record-card:visible':'.opada-data-scroller:visible').getByText('Jollof rice').first().waitFor();
    }
+   if(name==='owner'){
+    const ownerNav=async section=>{
+     const side=page.locator('.opada-side-nav').getByRole('button',{name:section});
+     const tabs=page.locator('.opada-tabs').getByRole('button',{name:section});
+     if(await side.isVisible())await side.click();
+     else{
+      if(!(await tabs.isVisible()))await page.locator('.opada-mobile-switch button').click();
+      await tabs.click();
+     }
+    };
+    await ownerNav('Payments');
+    await page.getByRole('heading',{name:'Verified Paystack receipts'}).waitFor();
+    await page.getByText('opada_test_visual_fixture').first().waitFor();
+    await ownerNav('Insights');
+    await page.getByRole('heading',{name:'Financial insights'}).waitFor();
+    await page.getByText('Review pricing and ingredient cost').first().waitFor();
+    await page.getByRole('button',{name:'Lock'}).click();
+    await page.getByRole('heading',{name:'Authorized test access'}).waitFor();
+    assert.equal(await page.locator('input[type="password"]').inputValue(),'');
+   }else{
+    await page.getByRole('button',{name:'Lock'}).click();
+    await page.getByRole('heading',{name:'Welcome back'}).waitFor();
+    assert.equal(await page.locator('input[type="password"]').inputValue(),'');
+   }
    console.log(`PASS ${device} ${name} authenticated viewport and mocked interaction`);
    await page.close();
   }
