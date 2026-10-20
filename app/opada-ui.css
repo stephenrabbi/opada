@@ -175,3 +175,14 @@
 .opada-home-footer p,.opada-home-footer small{color:#ebf7ef!important}
 @media(max-width:900px){.opada-home-hero{margin:0 14px;grid-template-columns:1fr;padding:45px 28px}.opada-home-steps{grid-template-columns:1fr}.opada-home-insights{grid-template-columns:1fr}.opada-home-content,.opada-home-insights{padding:62px 22px}}
 @media(max-width:620px){.opada-home-nav{padding:14px 18px;min-height:74px}.opada-home-nav nav{display:none}.opada-home-signin{padding:11px 13px;font-size:12px}.opada-home-hero{padding:38px 20px;gap:22px;border-radius:18px}.opada-home-hero h1{font-size:39px;letter-spacing:-1.5px}.opada-home-hero-copy>p{font-size:15px}.opada-home-mini-grid{grid-template-columns:1fr}.opada-home-showcase{padding:15px}.opada-home-flag-list article{grid-template-columns:1fr}.opada-home-footer{display:block}.opada-home-footer p{margin:8px 0}}
+
+/* Acceptance pass: consistent form field rhythm and keyboard/mobile ergonomics */
+.opada-staff-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.opada-staff-form textarea{min-height:110px;resize:vertical}
+.opada-staff-form label{min-width:0;line-height:1.45}
+.opada-staff-form button[type="submit"]{min-height:52px}
+.opada-staff-back{min-height:36px;align-items:center}
+.opada-staff-form [role="note"]{font-size:14px}
+.opada-home-nav a:focus-visible,.opada-staff-sidebar a:focus-visible{outline:3px solid #f4c65a;outline-offset:4px}
+.opada-home-footer small{line-height:1.55}
+@media(max-width:720px){.opada-staff-fields{grid-template-columns:1fr;gap:16px}.opada-staff-shell{width:100%;min-width:0}.opada-staff-form input,.opada-staff-form select,.opada-staff-form textarea{width:100%;max-width:100%}}
