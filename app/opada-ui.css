@@ -196,3 +196,12 @@
 @media(min-width:1100px){.opada-staff-mobile-nav{display:none}}
 @media(max-width:540px){.opada-staff-mobile-nav{gap:3px}.opada-staff-mobile-nav a{padding:10px 9px;flex:1;justify-content:center;white-space:nowrap;font-size:12px}.opada-home-hero h1{overflow-wrap:normal;hyphens:auto}}
 @media(prefers-reduced-motion:reduce){.opada-home a,.opada-staff button,.opada-owner button{transition:none!important}}
+
+/* Final homepage mobile access: keep portal links available on all devices */
+@media(max-width:620px){
+ .opada-home-nav{display:grid;grid-template-columns:1fr auto;row-gap:9px}
+ .opada-home-nav nav{grid-column:1/-1;grid-row:2;display:flex!important;gap:6px;justify-content:space-between;border-top:1px solid #d7e0d7;padding-top:10px}
+ .opada-home-nav nav a{display:inline-flex;justify-content:center;align-items:center;text-align:center;min-height:42px;flex:1;font-size:12px;padding:6px 4px;border-radius:7px;color:#1a4935!important}
+ .opada-home-nav nav a:focus-visible{outline:3px solid #975e04}
+ .opada-home-hero{margin-top:0}
+}
