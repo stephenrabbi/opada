@@ -46,11 +46,12 @@ try{
     await page.getByRole('button',{name:'Save for review'}).click();
     await page.getByRole('status').getByText(/mocked-qa-entry/).waitFor();
    }else{
-    if(width<1100){
-     await page.getByRole('button',{name:/Sections/}).click();
-     await page.getByRole('navigation',{name:'Owner sections'}).getByRole('button',{name:'Transactions'}).click();
-    }else{
-     await page.locator('.opada-side-nav').getByRole('button',{name:'Transactions'}).click();
+    const sidebarTransaction=page.locator('.opada-side-nav').getByRole('button',{name:'Transactions'});
+    const tabTransaction=page.locator('.opada-tabs').getByRole('button',{name:'Transactions'});
+    if(await sidebarTransaction.isVisible())await sidebarTransaction.click();
+    else{
+     if(!(await tabTransaction.isVisible()))await page.locator('.opada-mobile-switch button').click();
+     await tabTransaction.click();
     }
     await page.getByRole('textbox',{name:'Filter transactions'}).fill('jollof');
     await page.getByText('Jollof rice').first().waitFor();
