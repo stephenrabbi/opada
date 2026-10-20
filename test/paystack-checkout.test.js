@@ -22,7 +22,7 @@ test('initializes test checkout using Paystack REST API',async()=>{
  };
  const result=await initializeTestPayment({...fixture,reference},'sk_test_example_not_real',fakeFetch);
  assert.equal(sent.url,'https://api.paystack.co/transaction/initialize');
- assert.equal(JSON.parse(sent.opts.body).amount,10000);
+ assert.equal(JSON.parse(sent.opts.body).amount,'10000');
  assert.equal(result.reference,reference);
 });
 test('rejects non-Paystack checkout redirect',async()=>{
