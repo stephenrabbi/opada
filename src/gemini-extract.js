@@ -3,12 +3,13 @@ const allowedMethods=['cash','transfer','mixed','unknown'];
 export function validateExtraction(value){
  if(!value||typeof value!=='object'||Array.isArray(value)||!Array.isArray(value.entries)||value.entries.length>20)throw Error('Invalid extraction');
  const entries=value.entries.map(e=>{
- if(!e||typeof e!=='object'||!allowedTypes.includes(e.type)||typeof e.item!=='string'||!e.item.trim()||e.item.length>160)throw Error('Invalid entry');
+ if(!e||typeof e!=='object'||Array.isArray(e)||!allowedTypes.includes(e.type)||typeof e.item!=='string'||!e.item.trim()||e.item.length>160)throw Error('Invalid entry');
+ if(!Object.hasOwn(e,'quantity')||!Object.hasOwn(e,'amount_naira')||!Object.hasOwn(e,'unit_price_naira'))throw Error('Missing explicit monetary fields');
  const quantity=e.quantity;
  if(quantity!==null&&(!Number.isFinite(quantity)||quantity<0))throw Error('Invalid quantity');
  if(typeof e.unit!=='string'||e.unit.length>30||!allowedMethods.includes(e.payment_method))throw Error('Invalid unit or payment method');
- if(e.unit_price_naira!==null&&(!Number.isSafeInteger(e.unit_price_naira)||e.unit_price_naira<0))throw Error('Invalid price');
- if(e.amount_naira!==null&&(!Number.isSafeInteger(e.amount_naira)||e.amount_naira<0))throw Error('Invalid amount');
+ if(e.unit_price_naira!==null&&(!Number.isSafeInteger(e.unit_price_naira)||e.unit_price_naira<0||e.unit_price_naira>Number.MAX_SAFE_INTEGER/100))throw Error('Invalid price');
+ if(e.amount_naira!==null&&(!Number.isSafeInteger(e.amount_naira)||e.amount_naira<0||e.amount_naira>Number.MAX_SAFE_INTEGER/100))throw Error('Invalid amount');
  return{type:e.type,item:e.item.trim(),quantity,unit:e.unit,payment_method:e.payment_method,unit_price_kobo:e.unit_price_naira===null?null:e.unit_price_naira*100,amount_kobo:e.amount_naira===null?null:e.amount_naira*100,needs_review:true};
  });
  if(typeof value.notes!=='string'||value.notes.length>1000)throw Error('Invalid notes');
