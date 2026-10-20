@@ -205,3 +205,11 @@
  .opada-home-nav nav a:focus-visible{outline:3px solid #975e04}
  .opada-home-hero{margin-top:0}
 }
+
+/* Portal entry navigation for phone and tablet users */
+.opada-login-mobile-links{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:14px 0 5px}
+.opada-login-mobile-links a,.opada-login-mobile-links span{border-radius:9px;padding:10px 14px;min-height:42px;display:inline-flex;align-items:center;font-size:13px;font-weight:750;text-decoration:none}
+.opada-login-mobile-links a{background:#e6eee7;border:1px solid #bfcfc2;color:#174831!important}
+.opada-login-mobile-links span{background:#17543f;color:#fff}
+@media(min-width:1100px){.opada-login-mobile-links{display:none}}
+@media(max-width:540px){.opada-login-mobile-links{gap:5px}.opada-login-mobile-links a,.opada-login-mobile-links span{flex:1;justify-content:center;padding:9px 7px;font-size:12px}}
