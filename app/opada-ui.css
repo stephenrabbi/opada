@@ -34,3 +34,31 @@
 .opada-staff form>button[type="submit"]{min-height:48px;cursor:pointer}
 .opada-staff input:focus,.opada-staff select:focus,.opada-staff textarea:focus{border-color:#138061!important;box-shadow:0 0 0 3px #22966b1b}
 @media(max-width:640px){.opada-staff-hero{padding:20px!important;align-items:flex-start}.opada-hero-link{width:100%;text-align:center}.opada-owner table td{font-size:12px}.opada-owner section{overflow-wrap:anywhere}}
+
+/* Final responsive application shell */
+.opada-owner{max-width:1240px!important}
+.opada-owner>header{border-radius:22px!important}
+.opada-owner>section:not(.opada-metrics){border-radius:18px!important}
+.opada-mobile-switch{display:none}
+.opada-section-heading{display:flex;justify-content:space-between;align-items:start;gap:15px;flex-wrap:wrap;margin:0 0 6px}
+.opada-overline{display:block;font-weight:800;font-size:10px;letter-spacing:.16em;color:#43856c}
+.opada-status-count{display:inline-block;white-space:nowrap;background:#eef6f0;color:#276047;border-radius:999px;padding:7px 12px;font-size:12px;font-weight:750}
+.opada-data-scroller{max-width:100%;overflow-x:auto;border:1px solid #e5eae6;border-radius:12px;-webkit-overflow-scrolling:touch}
+.opada-data-scroller table{margin:0;border:0;min-width:560px;border-collapse:collapse}
+.opada-data-scroller thead th{background:#f1f6f2!important;color:#52645b;font-size:10px!important;padding:13px!important;letter-spacing:.08em}
+.opada-data-scroller tbody td{padding:13px!important;vertical-align:middle}
+.opada-owner section>p{line-height:1.6}
+.opada-owner section a[href="/staff"]{display:inline-flex;text-decoration:none;font-weight:750;color:#155f49!important}
+.opada-owner nav.opada-tabs{justify-content:flex-start}
+.opada-owner .opada-metric:hover{border-color:#b6d9c3;box-shadow:0 12px 27px #102d2b15}
+@media(max-width:700px){
+ .opada-mobile-switch{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:17px 0 8px;padding:7px 11px;border:1px solid #dce7de;background:#fff;border-radius:12px}
+ .opada-mobile-switch button{border:0;background:#174e3e;color:white;font-weight:700;border-radius:9px;padding:11px 13px;font-size:13px}
+ .opada-mobile-switch span{font-weight:700;font-size:13px;color:#416055}
+ .opada-owner nav.opada-tabs{display:none;position:static;margin:0 0 8px;flex-direction:column;gap:3px;overflow:visible}
+ .opada-owner nav.opada-tabs.opada-tabs-open{display:flex}
+ .opada-owner nav.opada-tabs button{text-align:left;font-size:14px;width:100%}
+ .opada-owner>header{border-radius:16px!important}
+ .opada-data-scroller{margin:0 -3px}
+ .opada-section-heading{align-items:center}
+}
