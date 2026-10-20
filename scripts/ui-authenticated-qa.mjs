@@ -68,7 +68,7 @@ try{
     };
     await ownerNav('Payments');
     await page.getByRole('heading',{name:'Verified Paystack receipts'}).waitFor();
-    await page.getByText('opada_test_visual_fixture').first().waitFor();
+    await page.locator(width<=620?'.opada-record-card:visible':'.opada-data-scroller:visible').getByText('opada_test_visual_fixture').first().waitFor();
     await ownerNav('Insights');
     await page.getByRole('heading',{name:'Financial insights'}).waitFor();
     await page.getByText('Review pricing and ingredient cost').first().waitFor();
