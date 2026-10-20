@@ -54,7 +54,7 @@ try{
      await tabTransaction.click();
     }
     await page.getByRole('textbox',{name:'Filter transactions'}).fill('jollof');
-    await page.getByText('Jollof rice').first().waitFor();
+    await page.locator(width<=620?'.opada-record-card:visible':'.opada-data-scroller:visible').getByText('Jollof rice').first().waitFor();
    }
    console.log(`PASS ${device} ${name} authenticated viewport and mocked interaction`);
    await page.close();
