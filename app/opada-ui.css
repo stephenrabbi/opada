@@ -108,3 +108,6 @@
  .opada-owner>header{min-height:130px}
 }
 @media(max-width:1099px){.opada-owner .opada-side-nav{display:none!important}}
+
+.opada-owner>header>strong{background:#fff0ca!important;color:#34250d!important;border:1px solid #d0ad5a!important}
+.opada-owner .opada-metric span,.opada-owner .opada-metric small{color:#41544a!important}
