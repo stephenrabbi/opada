@@ -1,4 +1,4 @@
-import{NextResponse}from'next/server';import{neon}from'@neondatabase/serverless';import{verifyPaystackSignature,validPaystackEvent,verifyTestTransaction}from'../../../../src/paystack.js';export const runtime='nodejs';export async function POST(request){
+import{NextResponse}from'next/server';import{neon}from'@neondatabase/serverless';import{verifyPaystackSignature,validPaystackEvent,verifyTestTransaction}from'../../../../src/paystack.js';import{runChecksSafely,lagosDay}from'../../../../src/checks.js';export const runtime='nodejs';export async function POST(request){
  const secret=process.env.PAYSTACK_TEST_SECRET_KEY;
  if(!secret?.startsWith('sk_test_')||!process.env.DATABASE_URL)return NextResponse.json({error:'Test webhook not configured'},{status:503});
  const raw=await request.text();if(raw.length>100000)return NextResponse.json({error:'Payload too large'},{status:413});
@@ -15,6 +15,8 @@ import{NextResponse}from'next/server';import{neon}from'@neondatabase/serverless'
  if(!expectation.length)return NextResponse.json({error:'Unknown mapped transaction'},{status:422});
  if(Number(expectation[0].expected_amount_kobo)!==data.amount)return NextResponse.json({error:'Expected amount mismatch'},{status:422});
  const saved=await sql`INSERT INTO payments(business_id,paystack_reference,amount_kobo,channel,paid_at) VALUES(${expectation[0].business_id},${ref},${data.amount},${data.channel||'unknown'},${data.paid_at}::timestamptz) ON CONFLICT(paystack_reference) DO NOTHING RETURNING id`;
- return NextResponse.json({acknowledged:true,recorded:saved.length===1});
+ // A newly recorded payment is new evidence for that payment's Lagos day.
+ const checks=saved.length?await runChecksSafely((t,p)=>sql.query(t,p),expectation[0].business_id,lagosDay(new Date(data.paid_at))):null;
+ return NextResponse.json({acknowledged:true,recorded:saved.length===1,checks});
  }catch{return NextResponse.json({error:'Verification or persistence unavailable'},{status:503})}
 }

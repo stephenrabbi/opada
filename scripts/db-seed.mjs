@@ -24,6 +24,8 @@ try {
     day: result.day, expires_in_hours: tokenTtlHours, tokens: result.tokens,
   }, null, 2) + '\n', {mode: 0o600});
   console.log(`Seeded day ${result.day}. Fresh test tokens written to ${TOKENS_FILE} (earlier seed tokens revoked).`);
+  const {written, skipped} = result.checks;
+  console.log(`Checks: ${written.length} flag(s) written (${written.map(w => w.rule + (w.item ? `:${w.item}` : '')).join(', ') || 'none'}); skipped: ${skipped.map(s => s.rule + (s.item ? `:${s.item}` : '') + '=' + s.reason).join(', ')}`);
 } catch (error) {
   console.error(error.message);
   process.exitCode = 1;

@@ -1,4 +1,4 @@
-import {NextResponse} from 'next/server';import {tokenDigest} from '../../../src/token-auth.js';import{validateEntry,TotalMismatchError}from'../../../src/ingest-schema.js';export const runtime='nodejs';
+import {NextResponse} from 'next/server';import {tokenDigest} from '../../../src/token-auth.js';import{validateEntry,TotalMismatchError}from'../../../src/ingest-schema.js';import{runChecksSafely}from'../../../src/checks.js';export const runtime='nodejs';
 export async function POST(request){
  const hash=tokenDigest(request.headers.get('authorization'));
  if(!hash)return NextResponse.json({error:'Unauthorized'},{status:401});
@@ -14,10 +14,10 @@ export async function POST(request){
   const actor=staff[0];
   // amount_kobo is the server-checked total (validateEntry rejects anything else).
   const result=await sql`INSERT INTO entries(business_id,type,item,quantity,unit,unit_price_kobo,amount_kobo,payment_method,payment_split,recorded_by,raw_text,source,needs_review,idempotency_key) VALUES(${actor.business_id},${entry.type},${entry.item},${entry.quantity},${entry.unit},${entry.unit_price_kobo},${entry.amount_kobo},${entry.payment_method},${JSON.stringify(entry.payment_split)}::jsonb,${actor.id},${entry.raw_text},'text',true,${entry.idempotency_key}) ON CONFLICT (business_id,idempotency_key) DO NOTHING RETURNING id,created_at`;
-  if(result.length)return NextResponse.json({entry_id:result[0].id,created_at:result[0].created_at,saved:true,duplicate:false,needs_review:true,processing:'not_enabled'}, {status:201});
+  if(result.length){const checks=await runChecksSafely((t,p)=>sql.query(t,p),actor.business_id);return NextResponse.json({entry_id:result[0].id,created_at:result[0].created_at,saved:true,duplicate:false,needs_review:true,checks}, {status:201})}
   // Same submission seen before (double tap or retry): return the original entry, save nothing.
   const original=await sql`SELECT id,created_at FROM entries WHERE business_id=${actor.business_id} AND idempotency_key=${entry.idempotency_key} LIMIT 1`;
   if(!original.length)return NextResponse.json({error:'Unable to store transaction'},{status:503});
-  return NextResponse.json({entry_id:original[0].id,created_at:original[0].created_at,saved:true,duplicate:true,needs_review:true,processing:'not_enabled'});
+  return NextResponse.json({entry_id:original[0].id,created_at:original[0].created_at,saved:true,duplicate:true,needs_review:true});
  }catch{return NextResponse.json({error:'Unable to store transaction'},{status:503})}
 }
