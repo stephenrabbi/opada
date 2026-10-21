@@ -1,5 +1,7 @@
 # Opada — Restaurant Intelligence
 
+**Co-developer:** Start with the [full engineering handover and customer-ready roadmap](docs/FULL_PRODUCT_HANDOVER.md). It covers access, current capabilities, architecture, all remaining production work, safety gates and definition of done.
+
 **Team Stack-Mind** | Restaurant-first financial visibility and operational reporting for Nigerian food businesses, with possible later expansion to other hospitality operators.
 
 > **Development preview — synthetic test data only.** Opada is an evolving prototype, not an approved live financial-operations platform. Do not enter real customer information, payment credentials, or financial transactions.
