@@ -4,14 +4,16 @@
   "private": true,
   "type": "module",
   "engines": {
-    "node": ">=22"
+    "node": ">=22.9"
   },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "test": "node --test",
-    "check": "node --check src/rules.js && node --check src/process.js && node --check src/ingest-schema.js && node --check src/token-auth.js"
+    "check": "node --check src/rules.js && node --check src/process.js && node --check src/ingest-schema.js && node --check src/token-auth.js",
+    "db:migrate": "node --env-file-if-exists=.env.local scripts/db-migrate.mjs",
+    "db:seed": "node --env-file-if-exists=.env.local scripts/db-seed.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "1.0.2",
@@ -19,5 +21,9 @@
     "next": "15.5.28",
     "react": "19.1.2",
     "react-dom": "19.1.2"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.11",
+    "pg": "8.23.1"
   }
 }
