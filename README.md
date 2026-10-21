@@ -38,6 +38,15 @@ The development preview contains a [Legal Centre](/legal) with [Privacy Notice](
 
 **Must be confirmed before real customers or personal financial records are onboarded:** the registered operator/controller name and business contact, working privacy/security and complaints channels, the controller–processor arrangements, lawful bases and data inventory, cookie audit, retention/deletion periods, cross-border transfer safeguards, incident response, NDPC registration/DPIA assessment where required, and any commercial pricing/refund/contract terms. Obtain review from a suitably qualified Nigerian legal and data-protection adviser.
 
+
+## Google Cloud speech recognition (opt-in, not activated)
+
+The staff voice interface now offers a **Google Cloud Speech-to-Text V2** mode behind the server-side flag `OPADA_GOOGLE_STT_ENABLED=true`. It remains disabled by default to prevent unexpected costs; the existing browser recognition and typed reporting remain available. V2 is **not** the 60-free-minutes V1 offer. Google V2 standard recognition is usage-billed, and Google Cloud billing, credentials, quota alerts and an explicit spending cap/operational approval must be configured before enabling it.
+
+Backend-only configuration: `GOOGLE_CLOUD_PROJECT_ID`, optional `GOOGLE_STT_LOCATION=us-central1`, and Google Application Default Credentials/service-account credentials stored as Vercel secrets—not as client-side `NEXT_PUBLIC_` values or committed files. Ensure the enabled Google Cloud Speech-to-Text V2 API is authorized and the Google identity has the minimum required permissions. Never commit or paste service-account JSON. Transcription requests require a valid synthetic staff token and impose an audio size limit. This is **not live-tested** against Google's API.
+
+Google V2 mode targets English (Nigeria), Yoruba, Igbo and Hausa as supported by an appropriate chosen model/region, subject to validation. **Dedicated Nigerian Pidgin is not asserted as supported**; Pidgin remains an experimental browser English fallback. Audio recording uses MediaRecorder; a browser/device may not produce an accepted format. All reports remain editable and unverified before submission.
+
 ## Developer quick start
 
 Requires Node.js >= 22.
