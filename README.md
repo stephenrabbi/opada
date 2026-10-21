@@ -31,6 +31,13 @@ Opada aims to help restaurants distinguish **staff-reported activity** from **in
 - Responsive homepage, staff portal and owner dashboard, with desktop sidebars and mobile navigation.
 - Automated Node.js tests, application build verification, Playwright screenshots of the homepage and unauthenticated portals at 1440×900, 820×1180, 390×844 and 360×800, and **mocked** authenticated staff/owner browser journeys. Mocked test responses do **not** establish live payment or database correctness.
 
+
+## Legal documents and compliance status
+
+The development preview contains a [Legal Centre](/legal) with [Privacy Notice](/legal/privacy), [Terms of Use](/legal/terms), [Cookies and Technology Notice](/legal/cookies), [Acceptable Use Policy](/legal/acceptable), [Financial and AI Disclaimer](/legal/disclaimer), and [Data Rights and Complaints](/legal/rights). The pages are intended for **synthetic development access**, not an assertion that all statutory requirements are already satisfied.
+
+**Must be confirmed before real customers or personal financial records are onboarded:** the registered operator/controller name and business contact, working privacy/security and complaints channels, the controller–processor arrangements, lawful bases and data inventory, cookie audit, retention/deletion periods, cross-border transfer safeguards, incident response, NDPC registration/DPIA assessment where required, and any commercial pricing/refund/contract terms. Obtain review from a suitably qualified Nigerian legal and data-protection adviser.
+
 ## Developer quick start
 
 Requires Node.js >= 22.
