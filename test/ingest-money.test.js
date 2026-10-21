@@ -71,3 +71,18 @@ test('a double tap with the same idempotency key saves exactly one entry', async
     VALUES ($1, 'sale', 'jollof rice', 3, 'plate', 'cash', $2, 'x', gen_random_uuid()) RETURNING id`, [SIMULATED_BUSINESS_ID, cashier]);
   assert.equal(again.rows.length, 1);
 });
+
+test('missing unit price skips the total check instead of failing it', () => {
+  const count = {...sale, type: 'stock_count', item: 'rice', unit: 'bag', quantity: 4, unit_price_kobo: null, amount_kobo: null};
+  assert.equal(validateEntry(count).amount_kobo, null);
+  // A stated total with no unit price is kept as stated: there is nothing to recompute it from.
+  assert.equal(validateEntry({...sale, unit_price_kobo: null, amount_kobo: 450000}).amount_kobo, 450000);
+});
+
+test('a unit price with a missing total is still a mismatch, not silently filled in', () =>
+  assert.throws(() => validateEntry({...sale, amount_kobo: null}), e => e instanceof TotalMismatchError && e.expectedKobo === 450000));
+
+test('money fields must be present (null is allowed, absent is not)', () => {
+  const {unit_price_kobo, ...noPrice} = sale;
+  assert.throws(() => validateEntry(noPrice), /Missing money/);
+});
