@@ -60,7 +60,18 @@ npm test
 npm run dev
 ```
 
-Use `npm run build` for a production-mode compile. Browser UI tests are run in [GitHub Actions](https://github.com/stephenrabbi/opada/actions) through `.github/workflows/ui-screenshots.yml`; they use a locally started app and synthetic API fixtures.
+Use `npm run build` for a production-mode compile.
+
+### Database and staging
+
+Copy `.env.example` to `.env.local` and fill in your own values (never commit them). Then:
+
+```sh
+npm run db:migrate   # apply db/migrations/*.sql to DATABASE_URL
+npm run db:seed      # seed the SIMULATED restaurant; test tokens go to .seed-tokens.local.json (gitignored)
+```
+
+`db/migrations/0001_baseline.sql` was reconstructed from the code. Anything guessed is marked `-- INFERRED`. Database tests run against in-memory Postgres (PGlite), so `npm test` needs no database. Full staging steps (Neon, Vercel CLI preview deploys, env vars, Paystack test webhook): [docs/engineering/STAGING_SETUP.md](docs/engineering/STAGING_SETUP.md). Browser UI tests are run in [GitHub Actions](https://github.com/stephenrabbi/opada/actions) through `.github/workflows/ui-screenshots.yml`; they use a locally started app and synthetic API fixtures.
 
 Environment configuration for database, Paystack, and Gemini features must use secrets management. Never commit credentials. Do not substitute live Paystack keys for test keys in the synthetic test environment.
 
