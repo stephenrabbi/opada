@@ -37,6 +37,11 @@ try{
     await page.getByText('Verified Paystack receipts').first().waitFor();
    }else{
     await page.getByRole('button',{name:'Save for review'}).waitFor();
+    await page.getByRole('region',{name:'Voice report'}).waitFor();
+    const languageChoices=await page.locator('#voice-language option').allTextContents();
+    assert.equal(languageChoices.length,5,'Five speech language selections must be visible');
+    await page.locator('#voice-language').selectOption('yo-NG');
+    assert.equal(await page.locator('#voice-language').inputValue(),'yo-NG');
    }
    await page.screenshot({path:`ui-screenshots/${device}-${name}-authenticated.png`,fullPage:true});
    const measures=await page.evaluate(()=>({documentWidth:document.documentElement.scrollWidth,viewport:innerWidth}));
