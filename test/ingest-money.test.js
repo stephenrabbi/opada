@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {PGlite} from '@electric-sql/pglite';
+import {newPglite} from '../db/pglite-for-tests.mjs';
 import {validateEntry, lineTotalKobo, TotalMismatchError} from '../src/ingest-schema.js';
 import {migrate} from '../db/migrate.mjs';
 import {seedSimulatedRestaurant, SIMULATED_BUSINESS_ID, SIMULATED_STAFF} from '../db/seed/simulated-restaurant.mjs';
@@ -50,7 +50,7 @@ test('idempotency key is required and must be a UUID', () => {
 
 // Same INSERT shape as app/api/ingest/route.js, against the real migrations.
 test('a double tap with the same idempotency key saves exactly one entry', async () => {
-  const pg = new PGlite();
+  const pg = await newPglite();
   const db = {exec: s => pg.exec(s), query: (s, p) => pg.query(s, p)};
   await migrate(db);
   await seedSimulatedRestaurant(db, {day: '2026-10-23'});

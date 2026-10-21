@@ -1,11 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {PGlite} from '@electric-sql/pglite';
+import {newPglite} from '../db/pglite-for-tests.mjs';
 import {migrate} from '../db/migrate.mjs';
 import {reserveGeminiCall, dailyCap, GeminiCapReachedError, GEMINI_DAILY_CALL_CAP_MAX} from '../src/gemini-budget.js';
 
 async function setup() {
-  const pg = new PGlite();
+  const pg = await newPglite();
   await migrate({exec: s => pg.exec(s), query: (s, p) => pg.query(s, p)});
   const lines = [];
   const log = {info: l => lines.push(JSON.parse(l)), warn: l => lines.push(JSON.parse(l))};
