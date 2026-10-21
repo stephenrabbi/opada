@@ -11,7 +11,8 @@ export const MIGRATIONS_DIR = path.join(path.dirname(fileURLToPath(import.meta.u
 export async function listMigrations(dir = MIGRATIONS_DIR) {
   const files = (await readdir(dir)).filter(f => /^\d{4}_[a-z0-9_]+\.sql$/.test(f)).sort();
   return Promise.all(files.map(async name => {
-    const sql = await readFile(path.join(dir, name), 'utf8');
+    // Normalise line endings: Windows checkouts get CRLF, CI/Vercel get LF; the checksum must match on both.
+    const sql = (await readFile(path.join(dir, name), 'utf8')).replace(/\r\n/g, '\n');
     return {version: name.replace(/\.sql$/, ''), sql, checksum: createHash('sha256').update(sql).digest('hex')};
   }));
 }

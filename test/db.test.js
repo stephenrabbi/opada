@@ -32,6 +32,15 @@ test('an applied migration that is later edited is refused', async () => {
   await assert.rejects(migrate(db, {dir}), /modified after it was applied/);
 });
 
+test('checksum ignores CRLF vs LF so Windows and Linux checkouts agree', async () => {
+  const dir = await mkdtemp(path.join(tmpdir(), 'opada-mig-'));
+  await writeFile(path.join(dir, '0001_t.sql'), 'CREATE TABLE t (id int);\nCREATE INDEX t_id ON t (id);\n');
+  const db = await freshDb();
+  await migrate(db, {dir});
+  await writeFile(path.join(dir, '0001_t.sql'), 'CREATE TABLE t (id int);\r\nCREATE INDEX t_id ON t (id);\r\n');
+  assert.deepEqual(await migrate(db, {dir}), []);
+});
+
 test('a failing migration rolls back and records nothing', async () => {
   const dir = await mkdtemp(path.join(tmpdir(), 'opada-mig-'));
   await writeFile(path.join(dir, '0001_bad.sql'), 'CREATE TABLE ok (id int); SELECT * FROM missing_table;');
