@@ -21,6 +21,8 @@ try{
    if(url.pathname==='/api/ingest'&&request.method()==='POST'){
     const payload=request.postDataJSON();
     assert.equal(payload.raw_text,'Synthetic visual QA report');
+    assert.match(payload.idempotency_key,/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
+    assert.equal(payload.amount_kobo,Math.round(payload.quantity*payload.unit_price_kobo));
     await route.fulfill({status:201,contentType:'application/json',body:JSON.stringify({entry_id:'mocked-qa-entry'})});return;
    }
    const response={'/api/me':identity,'/api/paystack/receipts':receipts,'/api/entries':entries,'/api/flags':flags}[url.pathname];
