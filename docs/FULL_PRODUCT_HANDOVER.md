@@ -3,6 +3,20 @@
 
 > **Read first:** Opada is currently a synthetic-data prototype. It has NOT been approved for real customer financial information, live payment collection or production onboarding. This document is an engineering handover, not a claim of security, legal or payment compliance. Founders plan to register Opada as a standalone Nigerian company; incorporation is not yet complete.
 
+## Verified co-developer access audit — 21 October 2026
+
+**Collaborator:** GitHub user `Okun15Ola` (displayed as Okunola Olubanjo in repository settings). Access was checked directly, not inferred from invitation status.
+
+| System | Verified state | Required action by service administrator |
+|---|---|---|
+| GitHub `stephenrabbi/opada` | **WRITE** permission confirmed | Continue development through branches/PRs; repo remains personally owned |
+| Vercel Opada team `team_ArQMTEz54qbqyzht3cwoV3KV` | Only current founder/owner account was returned in membership list | Invite partner through Vercel Team Settings → Members; confirm project access and permissions |
+| Neon `falling-rice-41327078` | Only current founder/admin account was returned in project-member list | Invite partner through Neon project's Members/Permissions interface; scope database access appropriately |
+| Paystack | Not checked / unknown | Confirm official team-member invitation independently; do not share personal passwords or live keys |
+| Figma | Not checked / unknown | Confirm editable access to Opada design file independently |
+
+**Safety:** No credentials were disclosed, permissions were changed, or ownership transferred during this audit. Do not put passwords, tokens, connection strings or two-factor recovery codes in this file. Partner cannot be assumed to have deployment/database rights from GitHub access alone.
+
 ## 1. Canonical links, version and access
 - GitHub: https://github.com/stephenrabbi/opada
 - **Current working branch:** `feature/paystack-free-checkout`; review PR https://github.com/stephenrabbi/opada/pull/5
