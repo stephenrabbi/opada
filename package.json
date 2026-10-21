@@ -14,10 +14,10 @@
     "check": "node --check src/rules.js && node --check src/process.js && node --check src/ingest-schema.js && node --check src/token-auth.js"
   },
   "dependencies": {
-    "next": "15.5.9",
-    "react": "19.1.2",
-    "react-dom": "19.1.2",
     "@neondatabase/serverless": "1.0.2",
-    "google-auth-library": "^9.15.1"
+    "google-auth-library": "^9.15.1",
+    "next": "15.5.28",
+    "react": "19.1.2",
+    "react-dom": "19.1.2"
   }
 }
