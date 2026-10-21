@@ -17,6 +17,7 @@
     "next": "15.5.9",
     "react": "19.1.2",
     "react-dom": "19.1.2",
-    "@neondatabase/serverless": "1.0.2"
+    "@neondatabase/serverless": "1.0.2",
+    "google-auth-library": "^9.15.1"
   }
 }
