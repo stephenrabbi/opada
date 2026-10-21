@@ -61,3 +61,5 @@ Environment configuration for database, Paystack, and Gemini features must use s
 - **Remaining gates:** partner review, physical device checks, Figma comparison, controlled live authenticated synthetic end-to-end verification, and production security/operations sign-off.
 
 This README describes the development branch. The default `main` branch is older until PR #5 is reviewed and merged.
+
+**Corporate structure decision (21 October 2026):** Opada is intended to be registered as a **standalone company**. Registration is not yet complete, so no company registration number, incorporation status, or final legal entity name is claimed. Update all legal policies and contracts once official CAC registration particulars and company contacts are available.
