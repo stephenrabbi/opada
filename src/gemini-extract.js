@@ -25,5 +25,6 @@ export async function extractWithGemini(text,key,fetcher=fetch){
  if(!response.ok)throw Error('Gemini request failed');
  const data=await response.json(),raw=data?.candidates?.[0]?.content?.parts?.find(p=>typeof p.text==='string')?.text;
  if(!raw)throw Error('Gemini returned no extraction');
- return validateExtraction(JSON.parse(raw));
+ // raw: the model's own output, kept so its original numbers are never lost.
+ const parsed=JSON.parse(raw);return{...validateExtraction(parsed),model,raw:parsed};
 }
