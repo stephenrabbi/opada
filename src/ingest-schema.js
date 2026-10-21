@@ -12,9 +12,13 @@ export function validateEntry(x){
  if(typeof x.item!=='string'||!x.item.trim()||x.item.length>160)throw Error('Invalid item');
  if(!Number.isFinite(x.quantity)||x.quantity<0)throw Error('Invalid quantity');
  if(!['plate','piece','kg','litre','bag'].includes(x.unit))throw Error('Invalid unit');
- if(!money(x.unit_price_kobo)||!money(x.amount_kobo))throw Error('Invalid money');
- const expected=lineTotalKobo(x.quantity,x.unit_price_kobo);
- if(x.amount_kobo!==expected)throw new TotalMismatchError(expected);
+ if(!Object.hasOwn(x,'unit_price_kobo')||!Object.hasOwn(x,'amount_kobo'))throw Error('Missing money fields');
+ if((x.unit_price_kobo!==null&&!money(x.unit_price_kobo))||(x.amount_kobo!==null&&!money(x.amount_kobo)))throw Error('Invalid money');
+ // No unit price (typical for stock counts): nothing to check against, so the stated amount (or null) stands.
+ if(x.unit_price_kobo!==null){
+  const expected=lineTotalKobo(x.quantity,x.unit_price_kobo);
+  if(x.amount_kobo!==expected)throw new TotalMismatchError(expected);
+ }
  if(!['cash','transfer','mixed','unknown'].includes(x.payment_method))throw Error('Invalid payment method');
  if(typeof x.raw_text!=='string'||!x.raw_text.trim()||x.raw_text.length>5000)throw Error('Invalid original message');
  if(x.type==='sale'&&x.quantity===0)throw Error('Sale requires quantity');
