@@ -22,7 +22,7 @@ export async function POST(request){
  const run=(text,params)=>auth.sql.query(text,params);
  try{
   const result=await ingestMessage({run,staff:auth.staff,text:body.text.trim(),idempotencyKey:body.idempotency_key.toLowerCase(),source,
-   reserve:()=>reserveGeminiCall(run),extract:text=>extractRecords(text)});
+   reserve:()=>reserveGeminiCall(run),extract:text=>extractRecords(text,{beforeRetry:()=>reserveGeminiCall(run)})});
   return reply({saved:true,...result},result.duplicate?200:201);
  }catch{return reply({error:'Unable to store message'},503)}
 }
