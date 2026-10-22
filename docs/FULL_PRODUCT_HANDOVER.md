@@ -146,3 +146,18 @@ ALL must be true, not merely a passing build:
 
 ## 8. Questions to resolve early (do not guess)
 Company legal name and ownership, technical lead's GitHub username, exact access roles, business model and who receives funds, first target restaurant workflows, permissions to use customer voice/data, paid-service budget (currently **NO PAID GOOGLE CLOUD**), preferred support/privacy email, retention periods, required offline mode and go-live date. Track decisions in GitHub issues or `docs/decisions/`.
+
+## Free-plan deployment policy — verified 22 October 2026
+
+**Decision: DO NOT create a GitHub Actions job that deploys partner-authored commits using the founder's Vercel credential to bypass Hobby collaboration restrictions.** Vercel's official guidance requires the Hobby team owner to be the commit author for deployments to that team. Hobby is for personal/non-commercial projects; do not assume it permits Opada's future commercial customer deployment. References:
+- https://vercel.com/docs/deployments/troubleshoot-project-collaboration
+- https://vercel.com/docs/git
+- https://vercel.com/docs/plans/hobby
+
+**Supported work today:** Okunola `Okun15Ola` has GitHub Write, Neon `opada` project Editor, Paystack Developer Support (screenshot shows 2FA enabled), and Figma invitation reported sent (edit rights not independently verified). Vercel membership audit showed only founder account.
+
+**Workflow:** partner develops in feature branches, opens PRs, runs `npm run check`, `npm test`, `npm run build`, and inspects GitHub Actions logs and screenshots. Existing `.github/workflows/ui-screenshots.yml` uses synthetic data and mocks. No live deploy, secrets transfer, production promotion or backend spending is authorized by this workflow.
+
+**Deployments:** Vercel previews of commits by non-owner may be blocked on Hobby. Preserve a green CI/build report as the verification artifact. A founder-authorized production deploy requires an approved compliant hosting setup and release gate; don't rewrite Git author metadata or put founder Vercel token into GitHub Actions as a workaround. If necessary evaluate other providers with explicitly permitted free team development, but confirm limitations and non-commercial restrictions before committing.
+
+**Operating note:** the current service remains a synthetic-only prototype; customer use requires proper production hosting, risk/security/legal review and founder approval. The collaborator may make code/DB development progress independently without Vercel deployment privileges.
