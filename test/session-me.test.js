@@ -11,7 +11,7 @@ test('valid opaque cookie resolves only database-scoped business identity',async
  let query='',params=[];
  const resolved=await resolveRequestSession({request:request(cookie),sql:async(parts,...values)=>{query=parts.join('?');params=values;return [staffA]}});
  assert.deepEqual(resolved,staffA);
- assert.match(query,/ss\.business_id=s\.business_id/);
+ assert.match(query,/s\.business_id=ss\.business_id/);
  assert.match(query,/ss\.revoked_at IS NULL/);
  assert.match(query,/ss\.expires_at>/);
  assert.match(query,/s\.active=true/);
