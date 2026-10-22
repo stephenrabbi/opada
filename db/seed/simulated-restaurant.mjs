@@ -82,6 +82,7 @@ export async function resetSimulatedRestaurant(db) {
   await db.query('DELETE FROM payments WHERE business_id = $1', id);
   await db.query('DELETE FROM paystack_expected_references WHERE business_id = $1', id);
   await db.query('DELETE FROM entries WHERE business_id = $1', id);
+  await db.query('DELETE FROM messages WHERE business_id = $1', id);  // after entries, which reference messages
   await db.query('DELETE FROM staff_api_tokens WHERE staff_id IN (SELECT id FROM staff WHERE business_id = $1)', id);
   await db.query('DELETE FROM staff WHERE business_id = $1', id);
   await db.query('DELETE FROM businesses WHERE id = $1', id);

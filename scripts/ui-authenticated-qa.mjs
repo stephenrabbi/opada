@@ -25,6 +25,13 @@ try{
     assert.equal(payload.amount_kobo,Math.round(payload.quantity*payload.unit_price_kobo));
     await route.fulfill({status:201,contentType:'application/json',body:JSON.stringify({entry_id:'mocked-qa-entry'})});return;
    }
+   if(url.pathname==='/api/ingest/message'&&request.method()==='POST'){
+    const payload=request.postDataJSON();
+    assert.equal(payload.text,'3 plate fried rice, 1800 each, dem transfer am');
+    assert.match(payload.idempotency_key,/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
+    const entry={id:'mocked-message-entry',line_no:1,type:'sale',item:'fried rice',quantity:'3',unit:'plate',unit_price_kobo:'180000',amount_kobo:'540000',payment_method:'transfer',needs_review:true,extraction:{review_reasons:['total_mismatch']}};
+    await route.fulfill({status:201,contentType:'application/json',body:JSON.stringify({saved:true,duplicate:false,status:'extracted',notice:null,entries:[entry]})});return;
+   }
    const response={'/api/me':identity,'/api/paystack/receipts':receipts,'/api/entries':entries,'/api/flags':flags}[url.pathname];
    await route.fulfill({status:response?200:404,contentType:'application/json',body:JSON.stringify(response||{error:'Unknown fixture'})});
   });
@@ -52,6 +59,12 @@ try{
     await page.getByRole('textbox',{name:/Original staff report/}).fill('Synthetic visual QA report');
     await page.getByRole('button',{name:'Save for review'}).click();
     await page.getByRole('status').getByText(/mocked-qa-entry/).waitFor();
+    await page.getByRole('textbox',{name:'Quick message'}).fill('3 plate fried rice, 1800 each, dem transfer am');
+    await page.getByRole('button',{name:'Send message'}).click();
+    await page.getByText('Saved for owner review:').waitFor();
+    await page.getByText(/fried rice, ₦5,400, transfer/).waitFor();
+    await page.getByText('Total corrected to quantity × price').waitFor();
+    await page.screenshot({path:`ui-screenshots/${device}-staff-quick-message.png`,fullPage:true});
    }else{
     const sidebarTransaction=page.locator('.opada-side-nav').getByRole('button',{name:'Transactions'});
     const tabTransaction=page.locator('.opada-tabs').getByRole('button',{name:'Transactions'});

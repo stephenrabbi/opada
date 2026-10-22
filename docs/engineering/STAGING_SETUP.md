@@ -31,6 +31,24 @@ OPADA_GOOGLE_STT_ENABLED=false
 
 Neon tip: pick region **AWS Europe (Frankfurt)**, the closest to Lagos. Postgres 16 or 17 both work.
 
+### Current staging database: temporary, claimable (expires ~72 h unless claimed)
+No personal Neon account was available on 22 Oct 2026, so staging uses Neon's **claimable** database, created without an account:
+
+```sh
+npx neon@latest claim create --region-id aws-eu-central-1 --file <scratch>/neon.env
+```
+(`npx neondb` and `npx neon-new` are deprecated and failed; this is the current command.) Only `DATABASE_URL` was copied into `.env.local`; the URL itself is never printed or committed.
+
+| | |
+|---|---|
+| Project ID | `crimson-resonance-64310535` (region `aws-eu-central-1`) |
+| Host | `ep-frosty-queen-bavj0cxi-pooler.c-8.eu-central-1.aws.neon.tech` (pooled; migrations work on it) |
+| **Expires** | **2026-10-25 14:55 UTC (15:55 WAT)**: the project and **all data are deleted** unless claimed |
+
+**To keep it:** `npx neon@latest claim accept crimson-resonance-64310535` opens a URL where you sign in to Neon (free) and take ownership. `npx neon@latest claim status crimson-resonance-64310535` shows the time left. Once claimed, the connection string stays the same. If it lapses: create a new one with the command above, replace `DATABASE_URL`, run `npm run db:migrate && npm run db:seed`.
+
+**Gemini model:** `gemini-2.5-flash` is closed to new API keys (HTTP 404). The default is now `gemini-3.5-flash`, with one automatic retry on `gemini-3.5-flash-lite` when Google is overloaded (429/5xx/timeout). Override with `GEMINI_MODEL` / `GEMINI_FALLBACK_MODEL`.
+
 ## 2. Run migrations
 ```sh
 npm run db:migrate
