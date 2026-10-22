@@ -256,3 +256,8 @@ Company legal name and ownership, technical lead's GitHub username, exact access
 ## Logout endpoint development — 22 October 2026
 - Added `POST /api/session/logout`, disabled unless `OPADA_SESSION_READ_ENABLED=true` and requiring HTTPS same-origin Origin header. Uses strict session cookie parsing and DB-backed revocation; clears browser cookie on success. Added `test/session-logout.test.js` with origin policy checks.
 - Default production remains disabled; not integrated with working login or frontend. Before enablement, confirm proxy origin handling, add CSRF defense-in-depth, test cookie clearance and revocation on isolated QA database, and verify all session consumers reject revoked tokens. Do not promote this as customer-ready authentication.
+
+## CI repair — logout same-origin tests (22 October 2026)
+- GitHub `Verify Opada rules and app` failed on earlier commit `f960c7f` because `test/session-logout.test.js` imported a Next.js route directly from Node's built-in test runner, causing `ERR_MODULE_NOT_FOUND` for `next/server`. UI screenshot checks had passed.
+- Moved `originIsAllowed` into standalone `src/session-origin.js`, imported it into the gated logout API route and updated unit tests to import this pure module. Committed as `92964a7`, `c074f22`, `c4c9992`. Latest CI needs confirmation before marking repair verified.
+- Logout and all other real customer session endpoints remain feature-gated/disabled. Production and main database remain unchanged.
