@@ -195,3 +195,8 @@ Company legal name and ownership, technical lead's GitHub username, exact access
 - Isolated QA Neon branch `br-steep-resonance-zaz6fqg3`: `staff_invitations` has zero stored records; both tenant foreign keys exist. A read-only PostgreSQL `EXPLAIN UPDATE` parsed and planned the guarded redemption SQL successfully; **EXPLAIN does not execute the update**.
 - Repeatable read-only verification added as `scripts/qa-invitation-readonly.sql`. The QA branch is not production or the default database branch.
 - **Important missing proof:** no synthetic actual insert/redeem, two-concurrent-redemptions experiment, or full verified identity-provider integration has been performed. Do not represent this as completed redemption integration testing or production sign-in readiness.
+
+## Invitation creation foundation — 22 October 2026
+- Added `src/prepare-staff-invitation.js` internal-only creation primitive. Requires server-authenticated owner and restaurant UUID; user-submitted business_id and owner role are rejected, stores only a hash of a random invitation secret and enforces 48-hour expiration. No public creation route or email delivery is enabled.
+- Added `test/prepare-staff-invitation.test.js` with mocked SQL adapter tests for role restrictions, cross-tenant input injection, and hashed token storage.
+- Isolated Neon QA branch read-only inspection showed two synthetic owner staff identities, and no invitation rows. **Live synthetic INSERT, concurrent redemption and rollback tests remain pending**. The internal helper's returned secret must never be logged or exposed before verified delivery and account verification controls exist.
