@@ -7,7 +7,12 @@ const mockToken='a'.repeat(40);
 const identity={staff:{id:'synthetic-staff',name:'Synthetic QA',role:'owner'},restaurant:{id:'synthetic-restaurant',name:'OPADA SYNTHETIC TEST RESTAURANT'}};
 const receipts={receipts:[{paystack_reference:'opada_test_visual_fixture',amount_kobo:10000,channel:'card',paid_at:'2026-10-20T11:00:00Z'}]};
 const entries={entries:[{id:'visual-entry-1',type:'sale',item:'Jollof rice',amount_kobo:150000,payment_method:'cash',needs_review:true,created_at:'2026-10-20T11:00:00Z'}]};
-const flags={flags:[{id:'visual-flag-1',rule:'margin_squeeze',status:'open',suggested_action:'Review pricing and ingredient cost',amount_gap_kobo:35000,evidence_ids:['visual-entry-1']}]};
+const marginFlag={id:'11111111-1111-4111-8111-111111111111',rule:'margin_squeeze',day:'2026-10-20',item:'jollof rice',status:'open',suggested_action:'Review pricing and ingredient cost',amount_gap_kobo:null,details:{proposed_price_kobo:185000},evidence_ids:['visual-entry-1'],updated_at:'2026-10-20T11:00:00Z'};
+const transferFlag={id:'22222222-2222-4222-8222-222222222222',rule:'transfer_paystack',day:'2026-10-20',item:null,status:'open',suggested_action:'₦3,500 recorded as transfer has no matching Paystack payment yet.',amount_gap_kobo:350000,details:{},evidence_ids:['visual-entry-1'],updated_at:'2026-10-20T12:00:00Z'};
+// Per-context state: the transfer alert "arrives" after sign-in, to prove auto-refresh, and can be marked checked.
+const state={flags:[marginFlag],checked:new Set()};
+const flagsNow=()=>({flags:state.flags.map(f=>state.checked.has(f.id)?{...f,status:'checked'}:f)});
+const evidence={flag:transferFlag,entries:[{id:'visual-entry-1',type:'sale',item:'fried rice',quantity:'3',unit:'plate',amount_kobo:'540000',payment_method:'transfer',payment_split:null,raw_text:'3 plate fried rice don comot, 1800 each, dem transfer am',created_at:'2026-10-20T12:20:00Z',recorded_by:'Tunde (simulated cashier)',review_reasons:[]}],payments:[{id:'p1',paystack_reference:'opada_test_visual_fixture',amount_kobo:'450000',channel:'bank_transfer',paid_at:'2026-10-20T12:30:00Z'}],menu:[],checked_by:null};
 const devices=[['desktop',1440,900],['tablet',820,1180],['iphone',390,844],['android',360,800]];
 const browser=await chromium.launch({headless:true});await mkdir('ui-screenshots',{recursive:true});
 try{
@@ -32,7 +37,9 @@ try{
     const entry={id:'mocked-message-entry',line_no:1,type:'sale',item:'fried rice',quantity:'3',unit:'plate',unit_price_kobo:'180000',amount_kobo:'540000',payment_method:'transfer',needs_review:true,extraction:{review_reasons:['total_mismatch']}};
     await route.fulfill({status:201,contentType:'application/json',body:JSON.stringify({saved:true,duplicate:false,status:'extracted',notice:null,entries:[entry]})});return;
    }
-   const response={'/api/me':identity,'/api/paystack/receipts':receipts,'/api/entries':entries,'/api/flags':flags}[url.pathname];
+   if(url.pathname==='/api/flags/check'&&request.method()==='POST'){state.checked.add(request.postDataJSON().flag_id);await route.fulfill({status:200,contentType:'application/json',body:'{"checked":true}'});return}
+   if(url.pathname.startsWith('/api/flags/')&&url.pathname.endsWith('/evidence')){await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(evidence)});return}
+   const response={'/api/me':identity,'/api/paystack/receipts':receipts,'/api/entries':entries,'/api/flags':flagsNow()}[url.pathname];
    await route.fulfill({status:response?200:404,contentType:'application/json',body:JSON.stringify(response||{error:'Unknown fixture'})});
   });
   for(const name of ['staff','owner']){
@@ -90,8 +97,23 @@ try{
     await page.getByRole('heading',{name:'Verified Paystack receipts'}).waitFor();
     await page.locator(width<=620?'.opada-record-card:visible':'.opada-data-scroller:visible').getByText('opada_test_visual_fixture').first().waitFor();
     await ownerNav('Insights');
-    await page.getByRole('heading',{name:'Financial insights'}).waitFor();
+    await page.getByRole('heading',{name:'Alerts'}).waitFor();
     await page.getByText('Review pricing and ingredient cost').first().waitFor();
+    await page.getByText('Suggested price: ₦1,850').waitFor();
+    assert.equal(await page.getByRole('button',{name:/apply/i}).count(),0,'No apply-price button in the demo');
+    // A new alert arrives server-side; auto-refresh (5 s) must show it, highlighted, without pressing Refresh.
+    state.flags=[transferFlag,marginFlag];
+    const alert=page.getByRole('article',{name:'Transfers vs Paystack alert'});
+    await alert.waitFor({timeout:9000});
+    await alert.getByText('New',{exact:true}).waitFor();
+    await alert.getByRole('button',{name:'View evidence'}).click();
+    await alert.getByText('Tunde (simulated cashier)',{exact:false}).waitFor();
+    await alert.getByText('3 plate fried rice don comot',{exact:false}).waitFor();
+    await page.screenshot({path:`ui-screenshots/${device}-owner-alert-evidence.png`,fullPage:true});
+    await alert.getByRole('button',{name:'Mark as checked'}).click();
+    await alert.getByText('Checked',{exact:true}).waitFor();
+    assert.equal(await alert.getByRole('button',{name:'Mark as checked'}).count(),0);
+    state.flags=[marginFlag];state.checked.clear();
     await page.getByRole('button',{name:'Lock'}).click();
     await page.getByRole('heading',{name:'Authorized test access'}).waitFor();
     assert.equal(await page.locator('input[type="password"]').inputValue(),'');
