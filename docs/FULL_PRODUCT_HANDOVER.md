@@ -261,3 +261,8 @@ Company legal name and ownership, technical lead's GitHub username, exact access
 - GitHub `Verify Opada rules and app` failed on earlier commit `f960c7f` because `test/session-logout.test.js` imported a Next.js route directly from Node's built-in test runner, causing `ERR_MODULE_NOT_FOUND` for `next/server`. UI screenshot checks had passed.
 - Moved `originIsAllowed` into standalone `src/session-origin.js`, imported it into the gated logout API route and updated unit tests to import this pure module. Committed as `92964a7`, `c074f22`, `c4c9992`. Latest CI needs confirmation before marking repair verified.
 - Logout and all other real customer session endpoints remain feature-gated/disabled. Production and main database remain unchanged.
+
+## Internal verified identity-to-session workflow — 22 October 2026
+- CI for preceding logout-origin fix `c4c9992` passed both application verification and UI screenshot automation.
+- Added `src/login-flow.js`: internal-only composition of signed identity verification, unique active staff lookup and database-backed opaque session creation. Added `test/login-flow.test.js` unit coverage for success, absent verification, and ambiguous staff membership; no public login endpoint was created.
+- **Not customer-ready:** no selected/configured identity provider, safe login CSRF/state handling, rate limiting, cookie issuance endpoint, MFA, recovery or integrated browser lifecycle tests. Main Neon and production remain unchanged. The helper must never be called with a caller-controlled verification callback in an HTTP request.
