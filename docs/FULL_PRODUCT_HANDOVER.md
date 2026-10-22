@@ -167,3 +167,9 @@ Company legal name and ownership, technical lead's GitHub username, exact access
 - Query always scopes to `staff.business_id` resolved server-side from authorization, never to a supplied customer or business selector. Response contains only id, display name, role, active status and created timestamp. No token hashes or auth subjects returned.
 - Tests for role restrictions, malformed business scope, and rejecting cross-restaurant selectors are in `test/team-access.test.js`. This is a **preparatory endpoint**, not production-ready staff onboarding, invitation or sign-in.
 - Still required: true secure account identity, MFA, session management, account recovery, owner-approved staff invitations, privileged audit logs, DB authorization/RLS or equivalent defense-in-depth, and integrated two-restaurant isolation testing. No customer data should be introduced.
+
+## Development increment — staff invitation primitives (22 October 2026)
+- Added `src/staff-invitation.js`: validates normalized invitee email and limited roles, allows only owner to initiate, rejects injected restaurant/staff identifiers, generates cryptographically random 256-bit invitation secrets, stores/compares only SHA-256 digests and defaults to 48-hour expiry.
+- Added `test/staff-invitation.test.js` regression coverage.
+- **Not enabled or connected to a live endpoint**: invitation links, mail delivery, one-time database token consumption, verified email ownership, session issuance, owner audit trail, rate limiting, revocation and complete customer login are not implemented. Do not invite real people or accept real credentials through the synthetic preview.
+- Next engineering work: design a migration and transactional redemption flow with tenant binding, uniqueness and revocation, followed by controlled tests on a disposable Neon branch before wiring any routes.
