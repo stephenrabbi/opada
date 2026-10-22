@@ -53,3 +53,17 @@ Post-application read-only verification:
 - `staff_session_tenant_fk`, `staff_inviter_tenant_fk`, and `staff_acceptor_tenant_fk` are all composite foreign keys using `(staff_id,business_id)` or `(invited_by/accepted_by,business_id)`.
 
 The original QA branch and production `main` remain unchanged. **The staging migration completed, but full end-to-end application tests against this Neon branch and checksum comparison with the Node migration runner remain pending.** Never turn on public login or migrate main based only on these schema-level checks.
+
+## Post-migration staging smoke audit — 23 October 2026
+
+The application and responsive UI GitHub workflows for commit `fbc33b8` both completed successfully.
+
+Read-only Neon staging queries verified:
+- The migration ledger includes versions `0001` through `0008`.
+- Migration checksum for `0008_staff_invitations` is `fe96600727866d9295675b7746d4419cce61b70104b231c2ba586e09da2e033a`; this is the **stored ledger value**, not an independently recalculated file hash.
+- Staging has 2 businesses, 2 staff records, zero session rows, zero invitation rows, zero login-attempt rows, and zero duplicate identity subjects **within any business**.
+- Tenant-scoped invitation/session foreign keys and uniqueness indexes were inspected after applying migrations.
+
+**Remaining release gates:** independently recalculate the `0008` migration checksum against the exact source bytes, run integration tests through the application against this Neon staging connection with *synthetic identities only*, confirm no external payment operations, obtain co-developer approval, and complete protected production rollout.
+
+Do not interpret the schema inspection alone as live login, token revocation, invite acceptance, or cross-tenant rejection having been exercised on Neon staging. Production remains unchanged.
