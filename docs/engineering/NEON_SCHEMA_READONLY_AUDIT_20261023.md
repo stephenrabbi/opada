@@ -28,3 +28,11 @@ Project: `opada` (PostgreSQL 17). Branch names and identifiers were checked thro
 6. The `/demo` funder simulation itself requires **no Neon migrations or real API credentials**, and should be prioritized for public deployment separately.
 
 This audit only used read-only metadata and information_schema queries; it did not change any Neon records or schema.
+
+## Fresh staging branch created (23 October 2026)
+
+- Branch: `opada-release-staging-20261023` (`br-silent-thunder-za79z7l8`), parent current `main`, created with Neon defaults after a custom suspend interval was rejected by this account.
+- Read-only verification confirms all five migration ledger entries `0001`–`0005` were copied into staging.
+- `staff.auth_subject` already exists and `UNIQUE (business_id,auth_subject)` is already enforced. The pending `0006` migration also adds a *separate* partial uniqueness index on `auth_subject`, which is stricter across all businesses. Review existing (non-sensitive, aggregate) duplicates and identity semantics before applying it.
+- The staff table currently has a primary key on `id`; `0006` proposes a composite unique index on `(id,business_id)` to support tenant-scoped foreign keys.
+- **No migrations have yet been applied to staging.** Validate migration checksums against source first and test DDL only on this isolated branch; do not point production Vercel secrets to it or merge the branch.
