@@ -5,6 +5,7 @@ import {sessionCookie} from '../../../../src/session-policy.js';
 import {originIsAllowed} from '../../../../src/session-origin.js';
 import {identityProviderConfig} from '../../../../src/verify-identity-token.js';
 import {loginFeatureEnabled,validateLoginPayload} from '../../../../src/login-policy.js';
+import {reserveLoginAttempt} from '../../../../src/login-rate-limit.js';
 
 export const runtime='nodejs';
 export const dynamic='force-dynamic';
@@ -37,7 +38,10 @@ export async function POST(request){
   const identityToken=validateLoginPayload(payload);
   if(!identityToken)return NextResponse.json({error:'Invalid request'},{status:400,headers});
   try{
-    const session=await beginVerifiedStaffSession({sql:neon(process.env.DATABASE_URL),identityToken});
+    const sql=neon(process.env.DATABASE_URL);
+    const permitted=await reserveLoginAttempt({sql});
+    if(!permitted)return NextResponse.json({error:'Too many sign-in requests'},{status:429,headers:{...headers,'Retry-After':'60'}});
+    const session=await beginVerifiedStaffSession({sql,identityToken});
     if(!session)return NextResponse.json({error:'Not authorized'},{status:401,headers});
     return NextResponse.json({authenticated:true,staff:session.staff},{headers:{...headers,'Set-Cookie':sessionCookie(session.secret)}});
   }catch{return NextResponse.json({error:'Sign-in unavailable'},{status:503,headers})}
