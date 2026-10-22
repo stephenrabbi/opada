@@ -208,3 +208,10 @@ Company legal name and ownership, technical lead's GitHub username, exact access
 - Issued **two parallel conditional redemption requests** against a second synthetic invitation: **one updated record and one empty result**. This supports single-use behavior for this test scenario, but is **not** a comprehensive stress test of all concurrency or isolation levels.
 - Previous GitHub checks on commit `87c324d` passed both automated app verification and screenshot tests.
 - **Remaining gates:** reject wrong-tenant actual inserts through composite FK, invalid identity, expired and revoked rows with database integration tests; audited server-issued email verification and identity/session integration; secrets, rate limiting, browser tests and independent security review. Real invitation APIs stay disabled.
+
+## Invitation rejection QA — 22 October 2026
+- Tested ONLY isolated Neon branch `br-steep-resonance-zaz6fqg3` with synthetic data.
+- Cross-tenant invitation INSERT using restaurant A business ID and restaurant B owner as inviter raised `foreign_key_violation`, caught by an assertion block. This verifies the composite inviter tenant FK on actual DB.
+- Attempting to create a row with expiry earlier than creation was rejected by `staff_invitation_time_check`. Created valid historical expired and currently revoked synthetic invitation fixtures instead.
+- Ran guarded redemption UPDATE against both expired and revoked fixtures; **zero rows updated** as expected. No production/default DB changes.
+- Remaining before public activation: wrong verified identity and role DB tests, identity provider/session integration, invitation delivery and abuse protection, transaction-level audit logging and independent security review.
