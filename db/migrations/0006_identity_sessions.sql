@@ -5,6 +5,9 @@ ALTER TABLE staff ADD COLUMN IF NOT EXISTS auth_subject text;
 -- Identity subjects may be reused across independently managed businesses.
 -- The existing (business_id, auth_subject) uniqueness constraint is the tenant boundary.
 -- Never impose global auth_subject uniqueness across unrelated tenants.
+-- The reconstructed baseline has no identity constraint, so enforce it here too.
+CREATE UNIQUE INDEX IF NOT EXISTS staff_business_auth_subject_unique
+  ON staff (business_id, auth_subject) WHERE auth_subject IS NOT NULL;
 -- Composite foreign keys prevent session records from crossing hospitality businesses.
 CREATE UNIQUE INDEX IF NOT EXISTS staff_id_business_id_unique ON staff(id,business_id);
 CREATE TABLE IF NOT EXISTS staff_sessions (
