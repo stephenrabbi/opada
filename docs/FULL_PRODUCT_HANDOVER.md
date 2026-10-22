@@ -236,3 +236,7 @@ Company legal name and ownership, technical lead's GitHub username, exact access
 - Added development migration `db/migrations/20261022_unique_identity_subject.sql`: partial UNIQUE index on `staff.auth_subject` (non-null only), preventing the same signed identity subject being assigned to multiple restaurant staff memberships in the current single-membership model.
 - Checked isolated Neon branch `br-steep-resonance-zaz6fqg3` for existing subject duplicates (none found), applied the index there, then verified index metadata. **Default/live database not changed.**
 - Multi-restaurant identity membership would require an explicit redesign and account switching; this enforces current one-identity-one-staff-record policy. Still no public login, secure session, MFA or real account activation.
+
+## Session foundation — 22 October 2026
+- Added `src/session-policy.js`: cryptographically random opaque session tokens, SHA-256 digest, constant-time digest comparison, secure `__Host-` HttpOnly/Secure/SameSite=Lax cookie (eight-hour maximum), expiry, revocation, staff active status and restaurant scope checks; `test/session-policy.test.js` covers core fail-closed cases.
+- **Not a functional session system:** no issuance/logout HTTP endpoints, database session storage/revocation, CSRF token enforcement on state-changing routes, provider sign-in UI or session authentication in current APIs. The existing synthetic bearer-token path is unchanged. Do not enable real customer authentication yet.
