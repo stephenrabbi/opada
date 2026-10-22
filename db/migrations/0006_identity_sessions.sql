@@ -2,8 +2,9 @@
 -- Run only through the numbered migration runner on a reviewed, isolated DB.
 -- No identity provider or public login is enabled by this schema change.
 ALTER TABLE staff ADD COLUMN IF NOT EXISTS auth_subject text;
-CREATE UNIQUE INDEX IF NOT EXISTS staff_auth_subject_unique
-  ON staff (auth_subject) WHERE auth_subject IS NOT NULL;
+-- Identity subjects may be reused across independently managed businesses.
+-- The existing (business_id, auth_subject) uniqueness constraint is the tenant boundary.
+-- Never impose global auth_subject uniqueness across unrelated tenants.
 -- Composite foreign keys prevent session records from crossing hospitality businesses.
 CREATE UNIQUE INDEX IF NOT EXISTS staff_id_business_id_unique ON staff(id,business_id);
 CREATE TABLE IF NOT EXISTS staff_sessions (
