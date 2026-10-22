@@ -71,6 +71,19 @@ npm run dev
 ```
 Open http://localhost:3000/owner, paste the **owner** token from `.seed-tokens.local.json`, and you should see the seeded entries and three verified test receipts. `/staff` takes a staff token.
 
+## Current staging (set up 22 Oct 2026)
+| | |
+|---|---|
+| Stable URL | **https://opada-staging-okun15ola.vercel.app** (alias; protected by Vercel Authentication, so sign in to Vercel as `okun15ola` to view) |
+| Project | `okun15olas-projects/opada-staging` (Hobby), functions in **fra1** (next to the Neon DB in eu-central-1) |
+| Env (Preview) | `DATABASE_URL`, `GEMINI_API_KEY`, `OPADA_GOOGLE_STT_ENABLED=false`. No Paystack key: the demo uses the seeded test-mode payments, no webhook |
+| Test without a browser | `vercel curl https://opada-staging-okun15ola.vercel.app/api/health --scope okun15olas-projects` (handles the protection) |
+
+**Gotchas found while setting it up:**
+- `vercel link` writes a short-lived `VERCEL_OIDC_TOKEN` into `.env.local` and appends `.vercel` and `.env*` to `.gitignore`. Keep the token (local only). **Revert the `.gitignore` lines**: `.env*` would start ignoring `.env.example`, and the existing rules already cover both.
+- A project made with `vercel project add` has no framework preset; `vercel.json` declares `"framework": "nextjs"` (and `"regions": ["fra1"]`).
+- `vercel deploy` uploads the folder, not the git tree: `.vercelignore` keeps `.env*`, `*.local.json` (seed tokens) and `ui-screenshots/` out.
+
 ## 5. Create the Vercel project and link it
 ```sh
 vercel login
