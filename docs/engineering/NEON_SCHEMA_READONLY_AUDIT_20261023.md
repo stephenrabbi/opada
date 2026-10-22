@@ -42,3 +42,14 @@ This audit only used read-only metadata and information_schema queries; it did n
 The `0006_identity_sessions.sql` release migration now explicitly adds a *tenant-scoped* unique index on `(business_id,auth_subject)`, instead of global identity uniqueness. This is required because the reconstructed `0001_baseline` does not declare the existing production constraint. The new test asserts both allowed cross-business membership and rejected within-business duplicates.
 
 Do not apply these migrations to the real main branch. First confirm the corrected commit's full test suite passes, compare existing migration ledger checksums, and validate on isolated staging.
+
+## Isolated staging migrations applied — 23 October 2026
+
+After CI success on the corrected identity uniqueness implementation, migration files `0006_identity_sessions`, `0007_login_attempt_buckets`, and `0008_staff_invitations` were applied as per-migration SQL transactions **only to branch `br-silent-thunder-za79z7l8`**. Migration checksums were computed directly from the GitHub SQL contents after fetching the current integration branch.
+
+Post-application read-only verification:
+- `schema_migrations` now lists `0001` through `0008`;
+- `staff_sessions`, `staff_invitations`, and `login_attempt_buckets` all exist;
+- `staff_session_tenant_fk`, `staff_inviter_tenant_fk`, and `staff_acceptor_tenant_fk` are all composite foreign keys using `(staff_id,business_id)` or `(invited_by/accepted_by,business_id)`.
+
+The original QA branch and production `main` remain unchanged. **The staging migration completed, but full end-to-end application tests against this Neon branch and checksum comparison with the Node migration runner remain pending.** Never turn on public login or migrate main based only on these schema-level checks.
