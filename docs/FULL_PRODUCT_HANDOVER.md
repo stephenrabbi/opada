@@ -220,3 +220,9 @@ Company legal name and ownership, technical lead's GitHub username, exact access
 - Added `src/identity-claims.js` pure validation of *already verified* provider claims: issuer, audience, subject, verified email, issued-at and expiration. Added `test/identity-claims.test.js` covering valid and rejected claims.
 - **Critical:** This module does NOT validate JWT cryptographic signatures, JWKS, nonce, token revocation or authentic browser sessions. It must never be used on unverified client-supplied JSON or headers. Provider SDK/server-side signed token validation and secure sessions must be integrated before it is used for live customer registration or invitation redemption.
 - Development branch only. No signup endpoints or production deployment changed.
+
+## Authentication increment — signed identity verification (22 October 2026)
+- Added the open-source `jose` dependency and `src/verify-identity-token.js`: server-side RS256 JWT signature verification via provider JWKS, issuer/audience pinning, expiry validation, HTTPS-only same-origin JWKS configuration, followed by verified-email/subject checks.
+- Added `test/verify-identity-token.test.js`: local generated signing key tests for valid, wrong audience, unverified email, wrong signature and invalid tokens; no external provider credentials or paid service.
+- Environment names (not values): `OPADA_IDENTITY_ISSUER`, `OPADA_IDENTITY_AUDIENCE`, `OPADA_IDENTITY_JWKS_URL`. Configuration is intentionally absent by default (fail closed); no public login endpoint uses this module yet.
+- Remaining: select an identity provider, configure trusted JWKS/issuer/audience, secure cookie-backed sessions, account recovery/MFA, tenant-backed authorization, CSRF and rate-limit defenses, identity-provider revocation assumptions, and complete end-to-end tests. A valid JWT alone is **not** restaurant authorization.
