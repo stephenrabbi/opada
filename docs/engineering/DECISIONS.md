@@ -74,8 +74,30 @@ The URL first put in `.env.local` pointed at a **pre-existing database** with He
 ## ADR-021: Gemini model default and one fallback retry (2026-10-22, accepted)
 `gemini-2.5-flash` returns 404 for new API keys. Default is now `gemini-3.5-flash`; on 429/5xx/timeout, one retry on `gemini-3.5-flash-lite`, with the extra call reserved against the 200/day cap first. Both overridable by env. **Observed 22 Oct ~16:00–17:00 WAT on the free AI Studio tier:** the primary returned 503 "high demand" on 4 of 7 calls and the fallback timed out twice. Free-tier capacity, not code, is now the main risk to the 60 s loop (see open decision D6).
 
+## ADR-022: Gemini capacity via paid tier, no Vertex work (2026-10-22, accepted by Okunola)
+D6 resolved: Okunola links the GCP credit/billing to the Opada project, which moves the existing AI Studio key to paid-tier capacity with no code change. Keep `gemini-3.5-flash` + `gemini-3.5-flash-lite` fallback. Re-run 3 timed loops (English, Pidgin, Yoruba) once billing is confirmed on.
+
+## ADR-023: Fallback retry waits 1.5 s; explicit time budget (2026-10-22, accepted)
+On 429/5xx/timeout: wait 1.5 s, reserve one more call against the cap, retry on the fallback model. Primary and fallback timeouts are 10 s each (were 12 s back to back): worst case 21.5 s of AI time. `/api/ingest/message` `maxDuration` raised 30 → 40 s (Hobby allows 60).
+
+## ADR-024: Staging on Okunola's Vercel Hobby, cut-off 21:00 (2026-10-22, accepted by Okunola)
+Preview-only deploys via CLI to `okun15olas-projects/opada-staging`, alias `opada-staging-okun15ola.vercel.app`, functions in **fra1** next to the Neon DB. Env vars set through `vercel env add` from stdin, never printed. `.vercelignore` keeps env files and seed tokens out of uploads. **No Paystack webhook for the demo**: the seeded test-mode payments are the documented fallback. If staging fails by 21:00, the fallback is **Option B locally** (LOCAL_DEMO_RUNBOOK.md), not Option A.
+
+## ADR-025: Demo shows the suggested price only (2026-10-22, accepted by Okunola)
+Margin alerts display "Suggested price: ₦X" from code; there is no "Apply new price" action (a browser test asserts no apply button exists).
+
+## ADR-026: Owner alerts refresh by polling every 5 s (2026-10-22, accepted)
+Polling while the tab is visible (paused when hidden), plus a "New" highlight and screen-reader announcement for new or changed alerts. Realtime push is M2. Polling is simple, works on Hobby, and fits the 60 s loop.
+
+## ADR-027: Herbert's database: rollback written, not run (2026-10-22, accepted by Okunola)
+Confirmed it is Herbert's Neon project. Change list and a tested rollback script are in `docs/engineering/incidents/`; not run. Nothing on his pushed branches breaks from our changes.
+
+## ADR-028: Herbert's work is reviewed, not merged, until after Demo Day (2026-10-22, accepted)
+His auth work is on PR #5's branch (not main). Review and merge plan: MAIN_REVIEW.md. The demo stays on our stack.
+
 ## Pending
-- **D6 Gemini capacity for Demo Day:** (a) Vertex AI on the Google Cloud hackathon credits (paid-tier capacity, same models, ~1.5 h behind `src/ai.js`; needs a GCP project + service account); (b) keep free tier and demo with pre-recorded fallback; (c) enable paid AI Studio billing (needs approval). Recommendation: (a).
+- **Production branch:** which branch Herbert's Vercel deploys to production (evidence says not PR #5's; Herbert to confirm). Merge hold (ADR-012) stays until then.
+- **Flag lifecycle (ADR-015):** confirm auto-resolve and re-open behaviour.
 - D2 Incremental TypeScript from M1.
 - D4 Owner alert channel beyond in-app polling (WhatsApp / SMS / push), M2, costs money.
 - D5 Paystack-only reconciliation scope (current design).
