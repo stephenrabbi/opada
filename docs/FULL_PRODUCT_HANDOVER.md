@@ -240,3 +240,9 @@ Company legal name and ownership, technical lead's GitHub username, exact access
 ## Session foundation — 22 October 2026
 - Added `src/session-policy.js`: cryptographically random opaque session tokens, SHA-256 digest, constant-time digest comparison, secure `__Host-` HttpOnly/Secure/SameSite=Lax cookie (eight-hour maximum), expiry, revocation, staff active status and restaurant scope checks; `test/session-policy.test.js` covers core fail-closed cases.
 - **Not a functional session system:** no issuance/logout HTTP endpoints, database session storage/revocation, CSRF token enforcement on state-changing routes, provider sign-in UI or session authentication in current APIs. The existing synthetic bearer-token path is unchanged. Do not enable real customer authentication yet.
+
+## Database-backed session development — 22 October 2026
+- Added `db/migrations/20261022_staff_sessions.sql`: secure session digest records with staff and restaurant composite foreign key, creation/expiry timestamps, unique token digest and server-side revocation timestamp.
+- Applied **only to isolated Neon QA branch** `br-steep-resonance-zaz6fqg3`; confirmed `staff_session_tenant_fk`, `staff_session_time_check` and `staff_sessions_token_digest_key` are present. **Main database untouched**.
+- Added `src/session-store.js`: internal-only creation for matching active staff, revocation by opaque-token digest, and active-session lookup bound to staff/restaurant. Added `test/session-store.test.js` mocked adapter tests.
+- **Not wired to HTTP endpoints, frontend, or a trusted identity provider.** A secure login flow still requires transactional issuance, trusted account identity, audited logout, CSRF/origin checks, rate limits and end-to-end testing. The current synthetic bearer-token UI remains unchanged.
