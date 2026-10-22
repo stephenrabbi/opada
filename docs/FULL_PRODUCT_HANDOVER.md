@@ -226,3 +226,8 @@ Company legal name and ownership, technical lead's GitHub username, exact access
 - Added `test/verify-identity-token.test.js`: local generated signing key tests for valid, wrong audience, unverified email, wrong signature and invalid tokens; no external provider credentials or paid service.
 - Environment names (not values): `OPADA_IDENTITY_ISSUER`, `OPADA_IDENTITY_AUDIENCE`, `OPADA_IDENTITY_JWKS_URL`. Configuration is intentionally absent by default (fail closed); no public login endpoint uses this module yet.
 - Remaining: select an identity provider, configure trusted JWKS/issuer/audience, secure cookie-backed sessions, account recovery/MFA, tenant-backed authorization, CSRF and rate-limit defenses, identity-provider revocation assumptions, and complete end-to-end tests. A valid JWT alone is **not** restaurant authorization.
+
+## Identity-to-restaurant membership bridge — 22 October 2026
+- Added `src/resolve-verified-staff.js`, an **internal-only** helper requiring signature-verified identity and exactly one active staff record associated with its provider subject. Rejects missing or duplicate matches, invalid roles and nonverified identity. Does not trust client-provided restaurant IDs.
+- Added `test/resolve-verified-staff.test.js` with mocked adapter regression checks.
+- **Not a working login flow:** no HTTP route, sessions, real provider configuration, database uniqueness migration, multi-restaurant membership strategy, or public account activation. No production changes.
