@@ -261,3 +261,30 @@
 .opada-voice-preview p{margin:6px 0 0;line-height:1.6}
 .opada-voice-disclosure{font-size:12px;color:#526457;line-height:1.6;margin:0}
 @media(max-width:620px){.opada-voice-report{padding:14px}.opada-voice-actions{align-items:stretch;flex-direction:column}.opada-voice-actions button{width:100%}}
+
+
+/* Synthetic funder demo: use the established Opada green/teal design language. */
+.opada-funder-demo{background:#f8f7f3!important;color:#17352f!important}
+.opada-funder-shell{max-width:1180px!important;gap:20px!important}
+.opada-funder-hero{background:linear-gradient(120deg,#102d35,#145443 78%,#1c7054)!important;color:#fff!important;border-radius:24px;padding:30px 34px!important;box-shadow:0 15px 38px #153a2c26;position:relative;overflow:hidden;min-height:178px}
+.opada-funder-hero:after{content:"";position:absolute;pointer-events:none;border:1px solid #ffffff2c;width:290px;height:290px;right:-100px;top:-145px;border-radius:50%;box-shadow:0 0 0 48px #ffffff08,0 0 0 95px #ffffff06}
+.opada-funder-hero>div,.opada-funder-hero>span{position:relative;z-index:1}
+.opada-funder-hero h1{color:#fff!important;font-weight:850;letter-spacing:-.045em}
+.opada-funder-hero p,.opada-funder-hero a{color:#d2e9df!important}
+.opada-funder-hero>span{background:#e5f5e9!important;color:#165137!important;border:1px solid #ccebd8}
+.opada-funder-demo .opada-funder-shell>section:not(.opada-funder-metrics){border:1px solid #e1e9e2!important;border-radius:20px!important;box-shadow:0 8px 24px #102d2910;padding:24px!important}
+.opada-funder-demo .opada-funder-shell>section[aria-label="Demo limitations"]{background:#eaf5ef!important;border-color:#cce6d8!important;box-shadow:none}
+.opada-funder-tabs{background:#eaf0eb;padding:7px;border-radius:15px;align-self:start;max-width:100%;overflow-x:auto}
+.opada-funder-tabs button{border-radius:11px!important;white-space:nowrap}
+.opada-funder-tabs button:first-child{background:#17664f}
+.opada-funder-metrics{gap:14px!important}
+.opada-funder-metrics article{border:1px solid #e0e9e3!important;border-radius:19px!important;box-shadow:0 7px 24px #153a2c12;min-width:0}
+.opada-funder-metrics article strong{color:#154a3a;letter-spacing:-.045em;overflow-wrap:anywhere;font-size:clamp(23px,2.7vw,35px)!important}
+.opada-funder-metrics article div{color:#647b6e!important;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.opada-funder-demo h2{color:#193c32;letter-spacing:-.025em}
+.opada-funder-demo button[type=submit],.opada-funder-demo section>button{background:#17664f!important;color:#fff!important}
+.opada-funder-demo input,.opada-funder-demo select{border:1px solid #cadbd0!important;background:#fcfefc!important}
+.opada-funder-demo table th{background:#f0f5f1;color:#3a6050;font-size:12px;text-transform:uppercase;letter-spacing:.045em}
+.opada-funder-demo table tbody tr:hover{background:#f6faf7}
+@media(max-width:640px){.opada-funder-demo{padding:12px 12px 40px!important}.opada-funder-hero{padding:22px 20px!important;min-height:auto;gap:15px!important}.opada-funder-hero>span{font-size:11px}.opada-funder-demo .opada-funder-shell>section:not(.opada-funder-metrics){padding:17px!important}.opada-funder-metrics{grid-template-columns:repeat(2,minmax(0,1fr))!important}.opada-funder-metrics article{padding:15px!important}.opada-funder-metrics article strong{font-size:23px!important}.opada-funder-tabs{width:100%;flex-wrap:nowrap!important}.opada-funder-tabs button{font-size:12px;padding:11px!important}.opada-funder-demo table{font-size:13px}}
+@media(max-width:370px){.opada-funder-metrics{grid-template-columns:1fr!important}}
