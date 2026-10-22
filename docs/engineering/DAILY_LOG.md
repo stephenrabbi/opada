@@ -9,3 +9,8 @@
 - **Done:** Tagged `demo-day-v0-fallback`; Next 15.5.28 + lockfile + `npm ci` (PR #7: 52/52 tests, build, 12/12 smoke incl. webhook); schema reconstructed + `db:migrate` + simulated seed + STAGING_SETUP.md (PR #8); server-side totals + idempotency key (PR #9); Gemini 200/day cap with logging (PR #10). Suite 75/75; migrate/seed and cap concurrency verified on throwaway local Postgres 17.
 - **Blocked:** Okunola's own Neon/Vercel/Paystack/Gemini accounts (no deploy until confirmed); B1 Gemini wiring on hold ≤2 h pending check for Herbert's unpushed code.
 - **Next:** B1 once released, then B2 rules → flags, B3 owner polling + Mark as checked; must hit the local loop by Thu 22 Oct 12:00 WAT.
+
+## 2026-10-22
+- **Done:** Totals check split by source (manual rejects, Gemini saves server amount + review, no price skips) with tests; B2 rules → flags on Lagos-day data (PR #11); B1 message → Gemini → entries + staff quick-message box (PR #12); fixed intermittent wasm out-of-memory test flake. Full suite green repeatedly.
+- **Blocked:** Okunola's `.env.local` (Neon, Vercel, Paystack test, Gemini) for migrate/seed/preview deploy; merges held until Herbert's production branch is confirmed (ADR-012).
+- **Next:** B3 owner dashboard (polling, Mark as checked, evidence drill-down) to hit the local-loop checkpoint Thu 22 Oct 12:00 WAT; then STAGING_SETUP.md on Okunola's accounts.

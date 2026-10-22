@@ -1,6 +1,6 @@
 # Opada roadmap
 
-Last updated 21 Oct 2026 (evening). Basis: [AUDIT_2026-10-21.md](AUDIT_2026-10-21.md); decisions in [DECISIONS.md](DECISIONS.md). Each milestone ships as small PRs. Nothing merges with failing tests or build (or lint/typecheck, once added).
+Last updated 22 Oct 2026. Basis: [AUDIT_2026-10-21.md](AUDIT_2026-10-21.md); decisions in [DECISIONS.md](DECISIONS.md). Each milestone ships as small PRs. Nothing merges with failing tests or build (or lint/typecheck, once added).
 
 Product rules that hold in every milestone: AI extracts and explains, code calculates; AI text with numbers is checked against computed values (template fallback); flags show evidence, not accusations; incomplete extractions save with `needs_review`; Paystack is the source of truth for money received; kobo integers; Africa/Lagos days.
 
@@ -8,7 +8,7 @@ Product rules that hold in every milestone: AI extracts and explains, code calcu
 
 ## M0: Demo safety (deadline Fri 23 Oct 2026)
 
-**Rules:** only demo-path changes. Preview/staging only; Okunola promotes. **Option B approved** (ADR-002).
+**Rules:** only demo-path changes. Preview/staging only; Okunola promotes. **Option B approved** (ADR-002). **No merges** of the stacked M0 PRs until Okunola confirms Herbert's production branch (ADR-012).
 
 **Infrastructure:** self-sufficient on Okunola's own free Neon, Vercel Hobby, Paystack test-mode and Gemini key (ADR-003). Nothing connects to Herbert's services. Everything is switchable to other infrastructure by env vars only. **No deploy until Okunola confirms the accounts are ready.**
 
@@ -26,14 +26,14 @@ Product rules that hold in every milestone: AI extracts and explains, code calcu
 | 0.3 | Schema reconstructed from code into `db/migrations/` (`-- INFERRED` marks), `npm run db:migrate` | 1.5 h | ✅ PR #8 |
 | 0.3a | Seed: simulated restaurant + matching Paystack test-mode payments | 1 h | ✅ PR #8 |
 | 0.3b | `STAGING_SETUP.md`: migrate, seed, Vercel CLI deploy, env vars, Paystack test webhook | 0.5 h | ✅ PR #8 |
-| 0.4m | **Money:** server recomputes every total, rejects mismatches | 0.5 h | ✅ PR #9 |
+| 0.4m | **Money:** server recomputes every total; manual mismatch rejected, Gemini mismatch saved with server amount + review; no price → check skipped (ADR-011) | 1 h | ✅ PR #9 (manual), PR #12 (Gemini) |
 | 0.4i | **Money:** entry idempotency key, so a double tap saves once | 1 h | ✅ PR #9 |
 | 0.4u | **Money:** unique constraint on `payments.paystack_reference` in the migration | — | ✅ PR #8 (0001) |
 | 0.4g | Gemini hard cap 200 calls/Lagos-day, clear 429, call-count logging | 1 h | ✅ PR #10 |
-| B1 | Message → Gemini → saved entries (`needs_review` on gaps/failures) | 3 h | ⏸ **on hold** (≤2 h) pending check for Herbert's unpushed code |
-| B2 | `runChecks(business, lagosDay)` → flags with `evidence_ids`, deduped | 4 h | next |
+| B1 | Message → Gemini → saved entries (`needs_review` on gaps/failures); staff quick-message box | 3 h | ✅ PR #12 (hold released, ADR-013) |
+| B2 | `runChecks(business, lagosDay)` → flags with `evidence_ids`, deduped, auto-resolve | 4 h | ✅ PR #11 |
 | B3 | Owner dashboard: 5 s polling, Mark as checked, evidence drill-down | 2.5 h | next |
-| B4 | Tests: Lagos midnight boundary, dedupe, missing prices, route integration | 2.5 h | next |
+| B4 | Tests: Lagos midnight boundary, dedupe, missing prices ✅ (in #11/#12); route integration against Neon | 1 h | after Neon |
 | 0.5 | Okunola: accounts ready → I run migrate + seed + preview deploy per `STAGING_SETUP.md` | 1 h | waiting on Okunola |
 | 0.6 | Three timed dry runs on staging; fallback screenshots + recording | 2 h | Thu |
 | 0.7 | Tag `demo-day-v1`; rollback steps in `docs/demo-day-runbook.md` | 0.5 h | Thu |
@@ -52,6 +52,7 @@ Current runbook: token sign-in → manual staff form → owner dashboard shows a
 - [ ] Every screen in the demo says SIMULATED / TEST MODE.
 - [x] Server rejects totals ≠ quantity × unit price; a double tap saves once; `paystack_reference` is unique (tests in PRs #8–#9).
 - [x] Gemini usage is capped at 200/day with a clear error (PR #10).
+- [x] Typed message → stored entries → rules → flags with evidence, in tests on the real migrations (PRs #11–#12). Still to prove on Neon + staging.
 - [ ] Rollback rehearsed once: alias re-pointed to the previous deployment on preview.
 - [ ] Nothing touches production or Herbert's services; no live Paystack keys.
 
