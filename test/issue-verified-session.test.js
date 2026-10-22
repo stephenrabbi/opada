@@ -23,8 +23,8 @@ test('signed identity maps to one tenant and only then receives persisted opaque
  assert.deepEqual(log[0].params,['verified-provider-subject']);
  assert.deepEqual(log[1].params.slice(1,3),['synthetic-staff-a','synthetic-restaurant-a'].slice(0,0)); // See explicit SQL assertions below.
  assert.match(log[1].query,/s\.active=true/);
- assert.equal(log[1].params[1],'synthetic-staff-a');
- assert.equal(log[1].params[2],'synthetic-restaurant-a');
+ assert.equal(log[1].params[3],'synthetic-staff-a');
+ assert.equal(log[1].params[4],'synthetic-restaurant-a');
  assert.match(result.cookie,/^__Host-opada_session=[A-Za-z0-9_-]{43}; Path=\/; HttpOnly; Secure; SameSite=Lax; Max-Age=28800$/);
  assert.equal(result.staff.business_id,'synthetic-restaurant-a');
  assert.equal(Object.hasOwn(result,'secret'),false);
