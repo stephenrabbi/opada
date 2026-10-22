@@ -6,6 +6,7 @@ on:
       - 'app/**'
       - 'scripts/ui-screenshots.mjs'
       - 'scripts/ui-authenticated-qa.mjs'
+      - 'scripts/ui-funder-demo-qa.mjs'
       - '.github/workflows/ui-screenshots.yml'
 jobs:
   capture:
@@ -31,6 +32,8 @@ jobs:
       - run: node scripts/ui-screenshots.mjs
       - name: Mocked authenticated staff and owner acceptance
         run: node scripts/ui-authenticated-qa.mjs
+      - name: Interactive synthetic funder demo acceptance
+        run: node scripts/ui-funder-demo-qa.mjs
       - name: Save screenshots for review
         if: always()
         uses: actions/upload-artifact@v4
