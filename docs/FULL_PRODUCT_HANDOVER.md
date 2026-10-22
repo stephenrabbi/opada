@@ -246,3 +246,9 @@ Company legal name and ownership, technical lead's GitHub username, exact access
 - Applied **only to isolated Neon QA branch** `br-steep-resonance-zaz6fqg3`; confirmed `staff_session_tenant_fk`, `staff_session_time_check` and `staff_sessions_token_digest_key` are present. **Main database untouched**.
 - Added `src/session-store.js`: internal-only creation for matching active staff, revocation by opaque-token digest, and active-session lookup bound to staff/restaurant. Added `test/session-store.test.js` mocked adapter tests.
 - **Not wired to HTTP endpoints, frontend, or a trusted identity provider.** A secure login flow still requires transactional issuance, trusted account identity, audited logout, CSRF/origin checks, rate limits and end-to-end testing. The current synthetic bearer-token UI remains unchanged.
+
+## Disabled session lookup route — 22 October 2026
+- Added `src/session-request.js`, a strict named-cookie parser rejecting duplicates, malformed or absent session secrets, plus DB-backed active staff session lookup.
+- Added `GET /api/session` behind **disabled-by-default** `OPADA_SESSION_READ_ENABLED=true`. It returns 404 while disabled, 401 for missing/invalid session when enabled, and only minimal current staff/restaurant identifiers when valid. No raw session secret or hash is exposed.
+- Added `test/session-request.test.js` for cookie parsing and database lookup safeguards.
+- This is NOT a functional sign-in experience: no live session issuance, logout routes, identity provider configuration, CSRF safeguards or customer onboarding. Main Neon/production remains unchanged. Do not enable flag until database migration and full security checks are complete.
