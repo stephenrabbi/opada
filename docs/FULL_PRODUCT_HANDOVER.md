@@ -189,3 +189,9 @@ Company legal name and ownership, technical lead's GitHub username, exact access
 - Isolated QA branch `br-steep-resonance-zaz6fqg3` was inspected read-only: **0 invitation records, both tenant foreign-key constraints present, 4 invitation indexes**. No real accounts or invitations were created.
 - Added `src/redeem-staff-invitation.js` internal-only conditional UPDATE designed to consume an invitation once, requiring a verified identity's subject/email, matching existing staff business and role, active status, valid expiry and no prior revoke/consume. `test/redeem-staff-invitation.test.js` covers fail-closed validation and guarded SQL generation.
 - **Not wired to an HTTP route or deployed as a working account system.** Requires identity-provider verification, account provisioning policy, transaction/integration tests against isolated DB, concurrency checks, and independent security review. No production DB changes.
+
+## Invitation QA follow-up — 22 October 2026
+- Latest GitHub automation at `e44cfbf` passed both `Verify Opada rules and app` and `Opada UI screenshots`.
+- Isolated QA Neon branch `br-steep-resonance-zaz6fqg3`: `staff_invitations` has zero stored records; both tenant foreign keys exist. A read-only PostgreSQL `EXPLAIN UPDATE` parsed and planned the guarded redemption SQL successfully; **EXPLAIN does not execute the update**.
+- Repeatable read-only verification added as `scripts/qa-invitation-readonly.sql`. The QA branch is not production or the default database branch.
+- **Important missing proof:** no synthetic actual insert/redeem, two-concurrent-redemptions experiment, or full verified identity-provider integration has been performed. Do not represent this as completed redemption integration testing or production sign-in readiness.
