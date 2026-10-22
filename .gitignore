@@ -7,3 +7,4 @@ node_modules/
 .vercel/
 *.local.json
 ui-screenshots/
+demo-video/

@@ -44,7 +44,7 @@ The staff screen says **"AI extraction is unavailable right now. Your message is
 1. Say so: "Even when the AI provider is down, the message is saved and nothing is lost."
 2. Wait 5 seconds and **send the same message again**: it's a new message, and the app already retries once on a fallback model.
 3. If it fails twice, use the **manual form** below the quick message (Type: Sale, Item: jollof rice, Quantity: 2, Unit price: 1500, Payment: Transfer). The server checks the total, saves it, and the rules run the same way, so the alert updates just the same.
-4. Last resort: play the backup video (`docs/engineering/demo-video/`, or the screen recording).
+4. Last resort: play the backup video (`demo-video/` (local, gitignored; record with `node scripts/record-demo-video.mjs`), or the screen recording).
 
 ## Reset between rehearsals
 ```sh

@@ -7,3 +7,5 @@
 ui-screenshots/
 docs/
 test/
+demo-video/
+scripts/record-demo-video.mjs
