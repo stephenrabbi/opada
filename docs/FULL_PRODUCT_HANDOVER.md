@@ -178,3 +178,9 @@ Company legal name and ownership, technical lead's GitHub username, exact access
 - Proposed migration: `db/migrations/20261022_staff_invitations.sql` adds a tenant-scoped invitation table with hash-only token storage, expiry, consume/revoke state, role restrictions and cross-tenant foreign-key checks. **Migration has not been applied to Neon or production.** Review it against a disposable database branch before running.
 - Added `src/invitation-state.js` pure fail-closed redemption eligibility check and `test/invitation-state.test.js` unit tests for email match, invalid/expired/revoked/consumed records.
 - No public invite creation or redemption routes, verified email system, transactions for atomic consumption, identity provider, account recovery or mail delivery are live. A policy check alone is not concurrency-safe: implementation must use an atomic guarded database operation and verified-auth identity before any account activation.
+
+## Invitation migration QA — 22 October 2026
+- Created **isolated Neon development branch** `br-steep-resonance-zaz6fqg3` (`opada-invitation-migration-qa`) from default branch. Do not treat it as main or production.
+- Executed the schema as a single transaction on that QA branch only; all statements succeeded. Verified constraints on `staff_invitations`, including both `staff_inviter_tenant_fk` and `staff_acceptor_tenant_fk`, via read-only schema inspection.
+- Fixed email regex in the committed migration to portable `[.]` form matching the validated QA schema. The SQL migration has **not been applied to main**. No real invitations were issued and no real customer data added.
+- Remaining tests before applying migration to an approved environment: synthetic insertion for correct/wrong tenant, duplicate tokens, expired/revoked/consumed flows, concurrency-safe atomic redemption, migrations/rollback strategy. Any destructive DB operation still needs founder approval.
