@@ -1,0 +1,9 @@
+# Never upload local secrets or local-only files with `vercel deploy`.
+.env
+.env.*
+!.env.example
+*.local.json
+.seed-tokens.local.json
+ui-screenshots/
+docs/
+test/
