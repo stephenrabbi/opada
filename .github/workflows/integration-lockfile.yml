@@ -1,0 +1,36 @@
+name: Integration lockfile repair
+on:
+  push:
+    branches: [integration/hospitality-auth-operations-20261022]
+    paths: ['package.json', '.github/workflows/integration-lockfile.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  reconcile:
+    if: github.repository == 'stephenrabbi/opada' && github.ref == 'refs/heads/integration/hospitality-auth-operations-20261022'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: true
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+      - name: Reconcile lockfile from package manifest
+        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+      - name: Verify clean install
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Run tests and build
+        run: |
+          npm test
+          npm run build
+      - name: Commit verified lockfile only
+        run: |
+          if ! git diff --quiet -- package-lock.json; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add package-lock.json
+            git commit -m 'build(integration): regenerate verified jose dependency lockfile'
+            git push origin HEAD:integration/hospitality-auth-operations-20261022
+          fi
