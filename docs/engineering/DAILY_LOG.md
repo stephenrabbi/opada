@@ -14,3 +14,8 @@
 - **Done:** Totals check split by source (manual rejects, Gemini saves server amount + review, no price skips) with tests; B2 rules → flags on Lagos-day data (PR #11); B1 message → Gemini → entries + staff quick-message box (PR #12); fixed intermittent wasm out-of-memory test flake. Full suite green repeatedly.
 - **Blocked:** Okunola's `.env.local` (Neon, Vercel, Paystack test, Gemini) for migrate/seed/preview deploy; merges held until Herbert's production branch is confirmed (ADR-012).
 - **Next:** B3 owner dashboard (polling, Mark as checked, evidence drill-down) to hit the local-loop checkpoint Thu 22 Oct 12:00 WAT; then STAGING_SETUP.md on Okunola's accounts.
+
+## 2026-10-22 (afternoon)
+- **Done:** Found the first DATABASE_URL was a pre-existing (Herbert-style) DB, stopped, reported; moved to a claimable Neon DB (empty-checked), migrate + seed OK; real-Gemini loop: when Gemini answered, message → flag → one-tap took 11.9–23.7 s; Gemini default model fixed (2.5-flash 404), fallback retry added, seed reset fixed. 12:00 checkpoint **missed** (wall clock) and the loop is **not reliable yet** because Gemini free tier returned 503s.
+- **Blocked:** Gemini free-tier capacity (decision D6); Vercel + Paystack test accounts for staging; possible rollback of schema changes on the first database (needs owner decision).
+- **Next:** on D6 = Vertex AI, wire the provider behind src/ai.js and re-run 3 timed loops; B3 owner dashboard (polling, Mark as checked, evidence); staging deploy once Vercel is ready.

@@ -68,7 +68,14 @@ A fresh in-memory Postgres per test intermittently crashed parallel test runs wi
 ## ADR-019: Message endpoint gets 30 s (2026-10-22, accepted)
 `/api/ingest/message` sets `maxDuration = 30` (Hobby allows up to 60 s; default is lower). Gemini has a 12 s timeout, plus DB writes and checks. Gemini "thinking" is left at its default; if latency threatens the 60 s loop, set a thinking budget of 0 and re-check accuracy.
 
+## ADR-020: Staging database is a temporary claimable Neon project (2026-10-22, accepted by Okunola)
+The URL first put in `.env.local` pointed at a **pre-existing database** with Herbert-style schema and data; migrations 0001–0005 ran on it (additive and relaxing changes only, nothing deleted) before this was spotted, and the seed rolled back. Staging moved to `npx neon@latest claim create` (Frankfurt), confirmed empty before migrating. **Expires 2026-10-25 14:55 UTC unless claimed** (see STAGING_SETUP.md). Lesson: the migrate script must confirm an empty or known database first. Follow-up: refuse to migrate when unknown tables exist unless `--adopt` is passed.
+
+## ADR-021: Gemini model default and one fallback retry (2026-10-22, accepted)
+`gemini-2.5-flash` returns 404 for new API keys. Default is now `gemini-3.5-flash`; on 429/5xx/timeout, one retry on `gemini-3.5-flash-lite`, with the extra call reserved against the 200/day cap first. Both overridable by env. **Observed 22 Oct ~16:00–17:00 WAT on the free AI Studio tier:** the primary returned 503 "high demand" on 4 of 7 calls and the fallback timed out twice. Free-tier capacity, not code, is now the main risk to the 60 s loop (see open decision D6).
+
 ## Pending
+- **D6 Gemini capacity for Demo Day:** (a) Vertex AI on the Google Cloud hackathon credits (paid-tier capacity, same models, ~1.5 h behind `src/ai.js`; needs a GCP project + service account); (b) keep free tier and demo with pre-recorded fallback; (c) enable paid AI Studio billing (needs approval). Recommendation: (a).
 - D2 Incremental TypeScript from M1.
 - D4 Owner alert channel beyond in-app polling (WhatsApp / SMS / push), M2, costs money.
 - D5 Paystack-only reconciliation scope (current design).
