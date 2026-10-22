@@ -161,3 +161,9 @@ Company legal name and ownership, technical lead's GitHub username, exact access
 **Deployments:** Vercel previews of commits by non-owner may be blocked on Hobby. Preserve a green CI/build report as the verification artifact. A founder-authorized production deploy requires an approved compliant hosting setup and release gate; don't rewrite Git author metadata or put founder Vercel token into GitHub Actions as a workaround. If necessary evaluate other providers with explicitly permitted free team development, but confirm limitations and non-commercial restrictions before committing.
 
 **Operating note:** the current service remains a synthetic-only prototype; customer use requires proper production hosting, risk/security/legal review and founder approval. The collaborator may make code/DB development progress independently without Vercel deployment privileges.
+
+## Development increment — 22 October 2026: read-only tenant-scoped team API
+- `GET /api/team` introduced on development branch. Requires current synthetic bearer-token authentication and `owner` or `manager` role; ordinary staff requests are denied.
+- Query always scopes to `staff.business_id` resolved server-side from authorization, never to a supplied customer or business selector. Response contains only id, display name, role, active status and created timestamp. No token hashes or auth subjects returned.
+- Tests for role restrictions, malformed business scope, and rejecting cross-restaurant selectors are in `test/team-access.test.js`. This is a **preparatory endpoint**, not production-ready staff onboarding, invitation or sign-in.
+- Still required: true secure account identity, MFA, session management, account recovery, owner-approved staff invitations, privileged audit logs, DB authorization/RLS or equivalent defense-in-depth, and integrated two-restaurant isolation testing. No customer data should be introduced.
