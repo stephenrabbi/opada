@@ -231,3 +231,8 @@ Company legal name and ownership, technical lead's GitHub username, exact access
 - Added `src/resolve-verified-staff.js`, an **internal-only** helper requiring signature-verified identity and exactly one active staff record associated with its provider subject. Rejects missing or duplicate matches, invalid roles and nonverified identity. Does not trust client-provided restaurant IDs.
 - Added `test/resolve-verified-staff.test.js` with mocked adapter regression checks.
 - **Not a working login flow:** no HTTP route, sessions, real provider configuration, database uniqueness migration, multi-restaurant membership strategy, or public account activation. No production changes.
+
+## Identity uniqueness QA — 22 October 2026
+- Added development migration `db/migrations/20261022_unique_identity_subject.sql`: partial UNIQUE index on `staff.auth_subject` (non-null only), preventing the same signed identity subject being assigned to multiple restaurant staff memberships in the current single-membership model.
+- Checked isolated Neon branch `br-steep-resonance-zaz6fqg3` for existing subject duplicates (none found), applied the index there, then verified index metadata. **Default/live database not changed.**
+- Multi-restaurant identity membership would require an explicit redesign and account switching; this enforces current one-identity-one-staff-record policy. Still no public login, secure session, MFA or real account activation.
