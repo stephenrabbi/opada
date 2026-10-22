@@ -184,3 +184,8 @@ Company legal name and ownership, technical lead's GitHub username, exact access
 - Executed the schema as a single transaction on that QA branch only; all statements succeeded. Verified constraints on `staff_invitations`, including both `staff_inviter_tenant_fk` and `staff_acceptor_tenant_fk`, via read-only schema inspection.
 - Fixed email regex in the committed migration to portable `[.]` form matching the validated QA schema. The SQL migration has **not been applied to main**. No real invitations were issued and no real customer data added.
 - Remaining tests before applying migration to an approved environment: synthetic insertion for correct/wrong tenant, duplicate tokens, expired/revoked/consumed flows, concurrency-safe atomic redemption, migrations/rollback strategy. Any destructive DB operation still needs founder approval.
+
+## Development increment — guarded invitation redemption (22 October 2026)
+- Isolated QA branch `br-steep-resonance-zaz6fqg3` was inspected read-only: **0 invitation records, both tenant foreign-key constraints present, 4 invitation indexes**. No real accounts or invitations were created.
+- Added `src/redeem-staff-invitation.js` internal-only conditional UPDATE designed to consume an invitation once, requiring a verified identity's subject/email, matching existing staff business and role, active status, valid expiry and no prior revoke/consume. `test/redeem-staff-invitation.test.js` covers fail-closed validation and guarded SQL generation.
+- **Not wired to an HTTP route or deployed as a working account system.** Requires identity-provider verification, account provisioning policy, transaction/integration tests against isolated DB, concurrency checks, and independent security review. No production DB changes.
