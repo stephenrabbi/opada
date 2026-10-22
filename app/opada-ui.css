@@ -1,0 +1,263 @@
+:root{font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color:#152839;background:#f8f7f3}*{box-sizing:border-box}body{margin:0!important;background:#f8f7f3!important;color:#152839!important}a{color:#176c55}button,input,select,textarea{font:inherit}button{transition:transform .15s ease,box-shadow .15s ease}button:not(:disabled):hover{transform:translateY(-1px);box-shadow:0 5px 18px #0b35271c}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #2caa85;outline-offset:2px}.opada-owner,.opada-staff{max-width:1180px!important;padding:32px 24px 70px!important;margin:0 auto!important}.opada-owner>header,.opada-staff>header{background:#102d35;border-radius:20px;padding:26px 30px;color:#fff!important;box-shadow:0 12px 25px #12342a18}.opada-owner>header h1,.opada-staff>header h1{color:#fff!important;letter-spacing:-.8px}.opada-owner>header p,.opada-owner>header a,.opada-staff>header p,.opada-staff>header a{color:#b7d1c9!important}.opada-owner>section,.opada-staff>section,.opada-staff>form{border:1px solid #e5e8e5!important;border-radius:20px!important;box-shadow:0 8px 22px #112d2910!important;padding:26px!important}.opada-owner section h2{letter-spacing:-.5px;font-size:22px!important}.opada-owner>section table{width:100%;min-width:580px}.opada-owner>section table th{font-size:11px;text-transform:uppercase;letter-spacing:.8px;background:#eff4f0}.opada-owner>section table td{line-height:1.55}.opada-owner>section a{color:#176c55!important}.opada-owner button,.opada-staff button[type=submit]{background:#14694f!important;border-radius:10px!important;color:#fff!important}.opada-staff h1{font-size:31px;letter-spacing:-1px}.opada-staff label{font-size:13px}.opada-staff input,.opada-staff select,.opada-staff textarea{background:#f9fbf9!important;border:1px solid #dbe5df!important}.opada-staff form{gap:20px!important}@media(max-width:640px){.opada-owner,.opada-staff{padding:12px 12px 60px!important}.opada-owner>header{padding:20px!important}.opada-owner>section,.opada-staff>form,.opada-staff>section{padding:17px!important;border-radius:15px!important}.opada-owner>section table{min-width:550px}.opada-owner h1{font-size:28px!important}.opada-owner>header strong{font-size:11px}.opada-staff h1{font-size:27px}}
+.opada-tabs{display:flex;gap:8;flex-wrap:wrap;overflow-x:auto;margin:20px 0 6px;padding:6px;background:#eaf0eb;border:1px solid #d8e3db;border-radius:14px}.opada-tabs button{border:0;border-radius:10px;padding:12px 18px;background:transparent;color:#4c615a;cursor:pointer;font-weight:700;white-space:nowrap}.opada-tabs button.active{background:#12664e;color:#fff;box-shadow:0 3px 9px #0b463522}.opada-owner section input[aria-label="Filter transactions"]{max-width:470px;display:block}.opada-owner>section table tbody tr:hover{background:#f6faf7}@media(max-width:640px){.opada-tabs{gap:2px;flex-wrap:nowrap}.opada-tabs button{padding:11px 12px;font-size:13px}}
+
+/* Opada restaurant intelligence dashboard — presentation layer */
+.opada-owner{max-width:1210px!important}
+.opada-owner>header{position:relative;overflow:hidden;background:linear-gradient(125deg,#112f35 0%,#164a45 72%,#1d6552 100%)!important;min-height:142px}
+.opada-owner>header:after{content:"";position:absolute;pointer-events:none;right:-85px;top:-150px;width:350px;height:350px;border:1px solid #ffffff2a;border-radius:50%;box-shadow:0 0 0 46px #ffffff08,0 0 0 95px #ffffff08}
+.opada-owner>header>div,.opada-owner>header>strong{position:relative;z-index:1}
+.opada-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:18px}
+.opada-metric{background:#fff;border:1px solid #e3eae5;box-shadow:0 8px 26px #122d2310;border-radius:18px;padding:24px;min-width:0;display:flex;flex-direction:column;gap:12px}
+.opada-metric span{font-weight:700;color:#687871;font-size:12px;letter-spacing:.05em;text-transform:uppercase}
+.opada-metric strong{font-size:clamp(26px,3vw,37px);letter-spacing:-.05em;color:#153930;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.opada-metric small{color:#77857f;font-size:12px;line-height:1.45}
+.opada-owner section h2{color:#172e2a}
+.opada-owner nav.opada-tabs{position:sticky;top:0;z-index:10;backdrop-filter:blur(10px);background:#eff3eeeF}
+@media(max-width:800px){.opada-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.opada-metric:last-child{grid-column:1/-1}}
+@media(max-width:540px){.opada-metrics{grid-template-columns:1fr;gap:9px}.opada-metric{padding:17px;gap:8px}.opada-metric:last-child{grid-column:auto}.opada-owner>header{min-height:0}.opada-owner>header:after{opacity:.45}}
+
+/* Status semantics and staff report polish */
+.opada-pill{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:999px;font-size:11px;font-weight:750;white-space:nowrap;line-height:1.3}
+.opada-pill-amber{background:#fff1d4;color:#88520b;border:1px solid #f4d796}
+.opada-pill-green{background:#e1f5e9;color:#176340;border:1px solid #b1e0c1}
+.opada-pill-neutral{background:#eef2f5;color:#485e6b;border:1px solid #dce4e8;text-transform:capitalize}
+.opada-staff-hero{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;background:linear-gradient(125deg,#102e34,#175843)!important;padding:26px!important;border-radius:20px;margin:15px 0 18px;box-shadow:0 12px 30px #153d3219}
+.opada-staff-hero h1{margin:8px 0!important;color:#fff!important}
+.opada-staff-hero p{color:#cce3dc;margin:3px 0}
+.opada-eyebrow{font-size:11px;font-weight:800;letter-spacing:.12em;color:#a3d6c1}
+.opada-hero-link{padding:11px 14px;border:1px solid #ffffff55;color:#fff!important;border-radius:10px;text-decoration:none;font-weight:700;font-size:13px}
+.opada-form-head{border-bottom:1px solid #e4eee8;padding-bottom:15px;margin-bottom:4px}
+.opada-form-head .opada-eyebrow{color:#227357}
+.opada-form-head h2{margin:10px 0 3px;color:#173c32;font-size:20px}
+.opada-form-head p{margin:0;font-size:13px;color:#667d72}
+.opada-form-note{background:#eef8f0;border-left:4px solid #238365;color:#365d4d;margin:0;padding:13px 15px;border-radius:7px;font-size:13px;line-height:1.55}
+.opada-staff form>button[type="submit"]{min-height:48px;cursor:pointer}
+.opada-staff input:focus,.opada-staff select:focus,.opada-staff textarea:focus{border-color:#138061!important;box-shadow:0 0 0 3px #22966b1b}
+@media(max-width:640px){.opada-staff-hero{padding:20px!important;align-items:flex-start}.opada-hero-link{width:100%;text-align:center}.opada-owner table td{font-size:12px}.opada-owner section{overflow-wrap:anywhere}}
+
+/* Final responsive application shell */
+.opada-owner{max-width:1240px!important}
+.opada-owner>header{border-radius:22px!important}
+.opada-owner>section:not(.opada-metrics){border-radius:18px!important}
+.opada-mobile-switch{display:none}
+.opada-section-heading{display:flex;justify-content:space-between;align-items:start;gap:15px;flex-wrap:wrap;margin:0 0 6px}
+.opada-overline{display:block;font-weight:800;font-size:10px;letter-spacing:.16em;color:#43856c}
+.opada-status-count{display:inline-block;white-space:nowrap;background:#eef6f0;color:#276047;border-radius:999px;padding:7px 12px;font-size:12px;font-weight:750}
+.opada-data-scroller{max-width:100%;overflow-x:auto;border:1px solid #e5eae6;border-radius:12px;-webkit-overflow-scrolling:touch}
+.opada-data-scroller table{margin:0;border:0;min-width:560px;border-collapse:collapse}
+.opada-data-scroller thead th{background:#f1f6f2!important;color:#52645b;font-size:10px!important;padding:13px!important;letter-spacing:.08em}
+.opada-data-scroller tbody td{padding:13px!important;vertical-align:middle}
+.opada-owner section>p{line-height:1.6}
+.opada-owner section a[href="/staff"]{display:inline-flex;text-decoration:none;font-weight:750;color:#155f49!important}
+.opada-owner nav.opada-tabs{justify-content:flex-start}
+.opada-owner .opada-metric:hover{border-color:#b6d9c3;box-shadow:0 12px 27px #102d2b15}
+@media(max-width:700px){
+ .opada-mobile-switch{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:17px 0 8px;padding:7px 11px;border:1px solid #dce7de;background:#fff;border-radius:12px}
+ .opada-mobile-switch button{border:0;background:#174e3e;color:white;font-weight:700;border-radius:9px;padding:11px 13px;font-size:13px}
+ .opada-mobile-switch span{font-weight:700;font-size:13px;color:#416055}
+ .opada-owner nav.opada-tabs{display:none;position:static;margin:0 0 8px;flex-direction:column;gap:3px;overflow:visible}
+ .opada-owner nav.opada-tabs.opada-tabs-open{display:flex}
+ .opada-owner nav.opada-tabs button{text-align:left;font-size:14px;width:100%}
+ .opada-owner>header{border-radius:16px!important}
+ .opada-data-scroller{margin:0 -3px}
+ .opada-section-heading{align-items:center}
+}
+
+/* Mobile-first record cards: no horizontal table navigation on phones */
+.opada-mobile-records{display:none}
+.opada-record-card{padding:16px;border:1px solid #e1e9e3;background:#fff;border-radius:14px;display:grid;gap:9px;overflow-wrap:anywhere;box-shadow:0 4px 12px #173e3410}
+.opada-record-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.opada-record-top strong{color:#193a31;font-size:18px;letter-spacing:-.02em}
+.opada-record-card p{margin:0;color:#52665b;font-size:13px}
+.opada-record-card small{color:#687970;font-size:12px}
+.opada-record-card code{color:#65766c;font-size:11px;overflow-wrap:anywhere}
+@media(max-width:700px){.opada-mobile-records{display:grid;gap:10px}.opada-owner .opada-data-scroller{display:none}.opada-record-top b{font-size:16px;color:#183f31}}
+
+/* Figma alignment and WCAG AA contrast correction; single authoritative palette */
+:root{--opada-ink:#142c2a;--opada-secondary:#42564d;--opada-forest:#102c34;--opada-primary:#126549;--opada-paper:#f7f5f0;--opada-line:#ced8d0;--opada-white:#fff}
+.opada-owner,.opada-staff{color:var(--opada-ink)!important;background:var(--opada-paper)!important}
+.opada-owner p,.opada-staff p{color:var(--opada-secondary)}
+.opada-owner small,.opada-staff small{color:#43574e}
+.opada-owner label,.opada-staff label{color:#1d3832}
+.opada-owner input,.opada-staff input,.opada-staff select,.opada-staff textarea{color:#17332b!important;background:#fff!important;border:1.5px solid #7e9589!important}
+.opada-owner input::placeholder,.opada-staff input::placeholder,.opada-staff textarea::placeholder{color:#526359!important;opacity:1}
+.opada-owner>header p,.opada-owner>header a,.opada-staff-hero p,.opada-staff-hero a{color:#effcf5!important}
+.opada-owner .opada-metric span,.opada-owner .opada-metric small{color:#40544b}
+.opada-owner .opada-overline{color:#126549}
+.opada-owner .opada-status-count{color:#154f34;background:#e2f3e8}
+.opada-pill-amber{color:#754000;background:#fff0c7;border-color:#d6ad57}
+.opada-pill-green{color:#145533;background:#def4e5;border-color:#a1d6b5}
+.opada-pill-neutral{color:#384950;background:#edf1f4;border-color:#b9c9d0}
+.opada-owner .opada-data-scroller th{color:#294a3b!important}
+.opada-owner .opada-data-scroller td{color:#1c302b!important}
+.opada-owner .opada-record-card p,.opada-owner .opada-record-card small,.opada-owner .opada-record-card code{color:#3f554a}
+.opada-staff .opada-form-head p{color:#42564c}
+.opada-owner .opada-side-nav{display:none}
+@media(min-width:1100px){
+ .opada-owner.opada-figma-shell{position:relative;max-width:1440px!important;min-height:100vh;margin:0 auto!important;padding:25px 30px 70px 292px!important}
+ .opada-owner .opada-side-nav{display:flex;position:absolute;top:0;left:0;bottom:0;width:262px;background:#102c34;color:#fff;flex-direction:column;padding:29px 17px;gap:54px;z-index:2}
+ .opada-brand{padding:0 15px;font-size:34px;font-weight:850;letter-spacing:-1.5px;line-height:1.2;color:#fff}
+ .opada-brand span{color:#e4b14c}
+ .opada-brand small{display:block;font-size:10px;letter-spacing:1.3px;color:#d0e5df;font-weight:700;margin-top:13px}
+ .opada-side-items{display:flex;flex-direction:column;gap:7px}
+ .opada-side-items button,.opada-side-items a{color:#eefaf5!important;border:0;background:transparent!important;text-align:left;text-decoration:none;font-size:15px;font-weight:650;padding:14px 17px;border-radius:11px;display:flex;gap:16px;align-items:center;cursor:pointer}
+ .opada-side-items button.active,.opada-side-items button:hover,.opada-side-items a:hover{background:#205044!important;color:#fff!important}
+ .opada-side-items button span{font-size:19px;color:#fff}
+ .opada-side-foot{color:#d0e5df!important;margin-top:auto;padding:0 14px;font-size:10px;letter-spacing:1px}
+ .opada-owner nav.opada-tabs,.opada-owner .opada-mobile-switch{display:none!important}
+ .opada-owner>header{min-height:130px}
+}
+@media(max-width:1099px){.opada-owner .opada-side-nav{display:none!important}}
+
+.opada-owner>header>strong{background:#fff0ca!important;color:#34250d!important;border:1px solid #d0ad5a!important}
+.opada-owner .opada-metric span,.opada-owner .opada-metric small{color:#41544a!important}
+
+/* Shared staff application shell */
+.opada-staff-shell{position:relative}
+.opada-staff-sidebar{display:none}
+.opada-staff-back{display:inline-flex;margin-bottom:12px;color:#235c47!important;font-weight:700;text-decoration:none}
+@media(min-width:1100px){
+.opada-staff.opada-staff-shell{max-width:1440px!important;min-height:100vh;padding:30px 48px 80px 310px!important}
+.opada-staff-sidebar{display:flex;position:absolute;left:0;top:0;bottom:0;width:262px;background:#102c34;flex-direction:column;gap:65px;padding:30px 18px}
+.opada-staff-sidebar nav{display:grid;gap:9px}
+.opada-staff-sidebar nav a{color:#f2faf5!important;text-decoration:none;padding:16px 17px;font-weight:700;border-radius:12px}
+.opada-staff-sidebar nav a.active,.opada-staff-sidebar nav a:hover{background:#205044;color:#fff!important}
+.opada-staff-sidebar .opada-side-foot{margin-top:auto;color:#e0f0e9!important;font-size:11px;letter-spacing:1px}
+}
+.opada-home{color:#142e2a;background:#f7f5f0;min-height:100vh}
+.opada-home a{transition:opacity .15s ease}
+.opada-home a:hover{opacity:.87}
+.opada-home-nav{max-width:1360px;margin:auto;min-height:94px;padding:15px 32px;display:flex;align-items:center;justify-content:space-between;gap:22px}
+.opada-home-logo{font-size:32px;font-weight:900;letter-spacing:-2px;text-decoration:none;color:#102c34!important}
+.opada-home-logo span,.opada-home-footer strong span{color:#bd8319}
+.opada-home-nav nav{display:flex;gap:27px;flex-wrap:wrap}
+.opada-home-nav nav a{color:#253d33;text-decoration:none;font-weight:700;font-size:14px}
+.opada-home-signin,.opada-home-primary{background:#145b44;color:#fff!important;text-decoration:none;padding:15px 20px;border-radius:11px;font-weight:800;display:inline-flex;gap:12px;align-items:center}
+.opada-home-hero{max-width:1360px;margin:10px auto 0;padding:65px 48px;min-height:560px;border-radius:28px;background:linear-gradient(120deg,#102d34,#19513e);color:#fff;display:grid;grid-template-columns:minmax(0,1.08fr) minmax(340px,.92fr);gap:42px;align-items:center}
+.opada-home-eyebrow{font-size:11px;letter-spacing:2px;font-weight:850;color:#d6eacb}
+.opada-home-eyebrow.dark{color:#28664d}
+.opada-home-hero h1{font-size:clamp(39px,4.7vw,68px);letter-spacing:-2.7px;line-height:1.09;margin:21px 0 21px;font-weight:850}
+.opada-home-hero h1 em{font-style:normal;color:#e9bd63}
+.opada-home-hero-copy>p{font-size:17px;line-height:1.75;color:#edf8f1;max-width:580px}
+.opada-home-actions{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-top:31px}
+.opada-home-primary{background:#f6c76e;color:#1b2e25!important}
+.opada-home-secondary{color:#fff!important;text-decoration:none;font-weight:800;padding:12px}
+.opada-home-hero-copy .opada-home-notice{font-size:11px;color:#e5eddd;letter-spacing:.6px;margin-top:28px}
+.opada-home-showcase{padding:24px;border:1px solid #9ebaae;background:#f7faf7;color:#18352b;border-radius:19px;box-shadow:0 24px 50px #071b1d60}
+.opada-home-showcase-head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:11px;font-weight:800;letter-spacing:1px}
+.opada-home-live{color:#18563a}
+.opada-home-mini-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:20px}
+.opada-home-mini-grid article{padding:19px;background:#fff;border:1px solid #d5e0d6;border-radius:14px;display:grid;gap:9px}
+.opada-home-mini-grid small{color:#48594e;font-size:10px;font-weight:800;letter-spacing:.8px}
+.opada-home-mini-grid strong{font-size:clamp(23px,2vw,31px);letter-spacing:-1px}
+.opada-home-mini-grid span{color:#4b5a50;font-size:12px}
+.opada-home-mini-insight{margin-top:13px;background:#e8efe9;border-radius:13px;padding:20px;display:grid;gap:10px}
+.opada-home-mini-insight>span{color:#15553d;font-size:11px;font-weight:850;letter-spacing:.6px}
+.opada-home-mini-insight>strong{font-size:21px}
+.opada-home-mini-insight>p{font-size:13px;line-height:1.6;margin:0;color:#314c3e}
+.opada-home-mini-insight>small{font-size:11px;color:#415b4a}
+.opada-home-content,.opada-home-insights{max-width:1280px;margin:0 auto;padding:90px 32px}
+.opada-home-content h2,.opada-home-insights h2{font-size:clamp(30px,3.2vw,46px);line-height:1.18;letter-spacing:-1px;max-width:660px;margin:16px 0 32px}
+.opada-home-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.opada-home-steps article,.opada-home-flag-list article{background:#fff;border:1px solid #dbe4dc;border-radius:17px;padding:28px}
+.opada-home-steps article>span{font-size:11px;letter-spacing:1.5px;font-weight:850;color:#205a43}
+.opada-home-steps article h3{font-size:22px;margin:28px 0 10px}
+.opada-home-steps article p,.opada-home-insights p{font-size:15px;line-height:1.8;color:#3e5147}
+.opada-home-insights{display:grid;grid-template-columns:1fr 1fr;gap:45px;align-items:center;padding-top:40px}
+.opada-home-insights a{font-weight:800;color:#165b42}
+.opada-home-flag-list{display:grid;gap:10px}
+.opada-home-flag-list article{padding:16px 20px;display:grid;grid-template-columns:1fr auto;gap:7px;align-items:center}
+.opada-home-flag-list article>span{text-transform:capitalize;color:#485d50;font-weight:700;font-size:13px}
+.opada-home-flag-list article strong{color:#203d31;font-size:19px}
+.opada-home-flag-list article small{grid-column:1/-1;color:#4b6055;font-size:11px}
+.opada-home-footer{margin-top:30px;padding:35px 32px;background:#102c34;color:#fff;display:flex;align-items:center;gap:25px;flex-wrap:wrap}
+.opada-home-footer strong{font-size:30px}
+.opada-home-footer p,.opada-home-footer small{color:#ebf7ef!important}
+@media(max-width:900px){.opada-home-hero{margin:0 14px;grid-template-columns:1fr;padding:45px 28px}.opada-home-steps{grid-template-columns:1fr}.opada-home-insights{grid-template-columns:1fr}.opada-home-content,.opada-home-insights{padding:62px 22px}}
+@media(max-width:620px){.opada-home-nav{padding:14px 18px;min-height:74px}.opada-home-nav nav{display:none}.opada-home-signin{padding:11px 13px;font-size:12px}.opada-home-hero{padding:38px 20px;gap:22px;border-radius:18px}.opada-home-hero h1{font-size:39px;letter-spacing:-1.5px}.opada-home-hero-copy>p{font-size:15px}.opada-home-mini-grid{grid-template-columns:1fr}.opada-home-showcase{padding:15px}.opada-home-flag-list article{grid-template-columns:1fr}.opada-home-footer{display:block}.opada-home-footer p{margin:8px 0}}
+
+/* Acceptance pass: consistent form field rhythm and keyboard/mobile ergonomics */
+.opada-staff-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.opada-staff-form textarea{min-height:110px;resize:vertical}
+.opada-staff-form label{min-width:0;line-height:1.45}
+.opada-staff-form button[type="submit"]{min-height:52px}
+.opada-staff-back{min-height:36px;align-items:center}
+.opada-staff-form [role="note"]{font-size:14px}
+.opada-home-nav a:focus-visible,.opada-staff-sidebar a:focus-visible{outline:3px solid #f4c65a;outline-offset:4px}
+.opada-home-footer small{line-height:1.55}
+@media(max-width:720px){.opada-staff-fields{grid-template-columns:1fr;gap:16px}.opada-staff-shell{width:100%;min-width:0}.opada-staff-form input,.opada-staff-form select,.opada-staff-form textarea{width:100%;max-width:100%}}
+
+/* Final cross-device navigation and focus treatment */
+.opada-staff-mobile-nav{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:2px 0 16px;padding:6px;border-radius:12px;background:#e8efea;border:1px solid #c9d9cd}
+.opada-staff-mobile-nav a{padding:10px 14px;display:inline-flex;min-height:43px;align-items:center;border-radius:9px;color:#173b2d!important;text-decoration:none;font-weight:750;font-size:13px}
+.opada-staff-mobile-nav a.active{background:#155b43;color:#fff!important}
+.opada-staff-mobile-nav a:focus-visible{outline:3px solid #9a5d00!important;outline-offset:2px}
+.opada-staff-form button[type="button"]{min-height:44px;cursor:pointer;border:1px solid #8b9b92;background:#fff;color:#193b30;border-radius:10px;font-weight:700}
+@media(min-width:1100px){.opada-staff-mobile-nav{display:none}}
+@media(max-width:540px){.opada-staff-mobile-nav{gap:3px}.opada-staff-mobile-nav a{padding:10px 9px;flex:1;justify-content:center;white-space:nowrap;font-size:12px}.opada-home-hero h1{overflow-wrap:normal;hyphens:auto}}
+@media(prefers-reduced-motion:reduce){.opada-home a,.opada-staff button,.opada-owner button{transition:none!important}}
+
+/* Final homepage mobile access: keep portal links available on all devices */
+@media(max-width:620px){
+ .opada-home-nav{display:grid;grid-template-columns:1fr auto;row-gap:9px}
+ .opada-home-nav nav{grid-column:1/-1;grid-row:2;display:flex!important;gap:6px;justify-content:space-between;border-top:1px solid #d7e0d7;padding-top:10px}
+ .opada-home-nav nav a{display:inline-flex;justify-content:center;align-items:center;text-align:center;min-height:42px;flex:1;font-size:12px;padding:6px 4px;border-radius:7px;color:#1a4935!important}
+ .opada-home-nav nav a:focus-visible{outline:3px solid #975e04}
+ .opada-home-hero{margin-top:0}
+}
+
+/* Portal entry navigation for phone and tablet users */
+.opada-login-mobile-links{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:14px 0 5px}
+.opada-login-mobile-links a,.opada-login-mobile-links span{border-radius:9px;padding:10px 14px;min-height:42px;display:inline-flex;align-items:center;font-size:13px;font-weight:750;text-decoration:none}
+.opada-login-mobile-links a{background:#e6eee7;border:1px solid #bfcfc2;color:#174831!important}
+.opada-login-mobile-links span{background:#17543f;color:#fff}
+@media(min-width:1100px){.opada-login-mobile-links{display:none}}
+@media(max-width:540px){.opada-login-mobile-links{gap:5px}.opada-login-mobile-links a,.opada-login-mobile-links span{flex:1;justify-content:center;padding:9px 7px;font-size:12px}}
+
+/* Accessibility quality gate: skip navigation, readable overlays, clear keyboard states */
+.opada-skip-link{position:absolute;top:-100px;left:15px;z-index:9999;padding:12px 18px;border-radius:8px;background:#fff;color:#123d2e!important;font-weight:800;box-shadow:0 0 0 3px #cf951d;text-decoration:none}
+.opada-skip-link:focus{top:14px}
+.opada-home-hero:focus{outline:none}
+.opada-home-nav a:focus-visible,.opada-home-actions a:focus-visible,.opada-home-insights a:focus-visible{outline:3px solid #d39b24!important;outline-offset:4px!important}
+.opada-home-signin{min-height:44px}
+.opada-owner input:focus-visible,.opada-staff input:focus-visible,.opada-staff select:focus-visible,.opada-staff textarea:focus-visible{outline:3px solid #b87c1b!important;outline-offset:2px!important}
+@media(max-width:620px){.opada-home-nav nav a{min-height:44px}.opada-home-actions a{min-height:46px}}
+
+/* Legal centre and globally visible policy navigation */
+.opada-legal-footer{background:#102c34;color:#fff;padding:28px max(22px,calc((100vw - 1250px)/2));display:grid;gap:14px;border-top:3px solid #c99d42}
+.opada-legal-footer strong{font-size:17px}
+.opada-legal-footer p,.opada-legal-footer small{margin:6px 0;color:#e4efe8;font-size:12px;line-height:1.6}
+.opada-legal-footer nav{display:flex;flex-wrap:wrap;gap:8px 19px}
+.opada-legal-footer a{font-size:13px;font-weight:700;color:#fff;text-decoration:underline;text-decoration-color:#e1c689;text-underline-offset:3px}
+.opada-legal-page{max-width:970px;padding:46px 24px 88px;margin:0 auto;color:#19372b}
+.opada-legal-page h1{font-size:clamp(36px,5vw,53px);line-height:1.13;margin:16px 0}
+.opada-legal-page h2{font-size:22px;margin:0 0 14px;color:#174534;line-height:1.3}
+.opada-legal-page p{font-size:16px;line-height:1.8;color:#314638}
+.opada-legal-page section{padding:26px 0;border-bottom:1px solid #d5ded4}
+.opada-legal-page .opada-legal-intro{font-size:19px;max-width:760px;color:#344a3c}
+.opada-legal-page .opada-legal-warning{padding:19px 22px;border-radius:12px;background:#fff0c5;color:#4b3516;border:1px solid #ddbc78;line-height:1.65;margin:22px 0}
+.opada-legal-date{font-size:12px!important;letter-spacing:.3px}
+.opada-legal-back{display:inline-block;margin-bottom:30px;font-weight:700;color:#1d654b!important}
+.opada-legal-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:28px}
+.opada-legal-grid a{display:grid;gap:14px;padding:22px;border:1px solid #d1dfd4;border-radius:13px;background:#fff;text-decoration:none;color:#143d2b!important}
+.opada-legal-grid a strong{font-size:19px}
+.opada-legal-grid a span{font-size:13px;font-weight:700}
+.opada-legal-next{margin-top:35px}
+@media(max-width:620px){.opada-legal-page{padding:30px 18px 64px}.opada-legal-grid{grid-template-columns:1fr}.opada-legal-page p{font-size:15px}.opada-legal-footer{padding:28px 20px}}
+
+/* Experimental opt-in multilingual voice reporting */
+.opada-voice-report{background:#f4f7f1;border:1px solid #c9dbcf;border-radius:14px;padding:18px;display:grid;gap:12px;min-width:0}
+.opada-voice-head{display:flex;justify-content:space-between;align-items:center;gap:12px;color:#174534}
+.opada-voice-head strong{font-size:18px}
+.opada-voice-head p{font-size:13px;margin:5px 0 0;line-height:1.5}
+.opada-voice-report label{font-weight:700;font-size:14px}
+.opada-voice-report select{width:100%;min-width:0;box-sizing:border-box;font:inherit;font-size:16px;padding:12px;border-radius:9px;border:1px solid #8fa99b;background:#fff;color:#163c2d}
+.opada-voice-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.opada-voice-actions button{border:0;border-radius:10px;background:#1b5b43;color:#fff;font-weight:700;padding:13px 17px;min-height:45px;cursor:pointer}
+.opada-voice-actions button[aria-pressed="true"]{background:#a73629}
+.opada-voice-actions button:disabled{opacity:.55;cursor:not-allowed}
+.opada-voice-actions [role="status"]{font-size:13px;line-height:1.5;flex:1;min-width:170px}
+.opada-voice-preview{border-left:3px solid #1b5b43;background:#fff;border-radius:7px;padding:12px;overflow-wrap:anywhere}
+.opada-voice-preview p{margin:6px 0 0;line-height:1.6}
+.opada-voice-disclosure{font-size:12px;color:#526457;line-height:1.6;margin:0}
+@media(max-width:620px){.opada-voice-report{padding:14px}.opada-voice-actions{align-items:stretch;flex-direction:column}.opada-voice-actions button{width:100%}}
