@@ -200,3 +200,11 @@ Company legal name and ownership, technical lead's GitHub username, exact access
 - Added `src/prepare-staff-invitation.js` internal-only creation primitive. Requires server-authenticated owner and restaurant UUID; user-submitted business_id and owner role are rejected, stores only a hash of a random invitation secret and enforces 48-hour expiration. No public creation route or email delivery is enabled.
 - Added `test/prepare-staff-invitation.test.js` with mocked SQL adapter tests for role restrictions, cross-tenant input injection, and hashed token storage.
 - Isolated Neon QA branch read-only inspection showed two synthetic owner staff identities, and no invitation rows. **Live synthetic INSERT, concurrent redemption and rollback tests remain pending**. The internal helper's returned secret must never be logged or exposed before verified delivery and account verification controls exist.
+
+## Neon QA actual synthetic invitation redemption — 22 October 2026
+- **Environment:** ONLY isolated non-default Neon branch `br-steep-resonance-zaz6fqg3` under project `falling-rice-41327078`. Live/default database and customer-facing app untouched.
+- Inserted two synthetic staff identities (subjects `opada-invite-qa-20261022` and `opada-invite-concurrency-20261022`) and two synthetic invitation rows using reserved `.invalid` email addresses; these QA fixtures remain on the isolated branch.
+- First actual conditional redemption returned **one updated invitation**; immediate replay returned **zero updated records**.
+- Issued **two parallel conditional redemption requests** against a second synthetic invitation: **one updated record and one empty result**. This supports single-use behavior for this test scenario, but is **not** a comprehensive stress test of all concurrency or isolation levels.
+- Previous GitHub checks on commit `87c324d` passed both automated app verification and screenshot tests.
+- **Remaining gates:** reject wrong-tenant actual inserts through composite FK, invalid identity, expired and revoked rows with database integration tests; audited server-issued email verification and identity/session integration; secrets, rate limiting, browser tests and independent security review. Real invitation APIs stay disabled.
