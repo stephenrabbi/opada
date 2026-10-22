@@ -5,8 +5,8 @@ import {reserveGeminiCall} from '../../../../src/gemini-budget.js';
 import {extractRecords} from '../../../../src/ai.js';
 export const runtime='nodejs';
 export const dynamic='force-dynamic';
-// Gemini has a 12 s timeout; leave room for the DB writes and checks (Hobby allows up to 60 s).
-export const maxDuration=30;
+// Worst case AI time is 10 s + 1.5 s backoff + 10 s fallback (src/ai.js), plus DB writes and checks. Hobby allows up to 60 s.
+export const maxDuration=40;
 const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 function reply(data,status=200){return NextResponse.json(data,{status,headers:{'Cache-Control':'no-store'}})}
 export async function POST(request){
