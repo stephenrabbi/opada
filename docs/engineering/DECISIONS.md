@@ -95,6 +95,13 @@ Confirmed it is Herbert's Neon project. Change list and a tested rollback script
 ## ADR-028: Herbert's work is reviewed, not merged, until after Demo Day (2026-10-22, accepted)
 His auth work is on PR #5's branch (not main). Review and merge plan: MAIN_REVIEW.md. The demo stays on our stack.
 
+## ADR-029: Demo Day is Saturday 24 Oct; Friday is a controlled integration day (2026-10-22, accepted by Okunola)
+- **Fallback, fixed tonight:** tag `demo-day-v1` → `671d973` (stack #7–#13 head; the commit staging and the backup video were built from). Staging and the video stay as they are.
+- **Friday:** `integration/demo-day` from PR #5's branch (incl. Herbert's ~30 auth commits) + our stack merged in; resolve the 3 conflicts; one migration naming scheme (new ADR); Herbert's auth stays disabled. His live-site code is included only if pushed by 10:00 WAT and clean. Full tests → **separate** staging preview (the working one is untouched) → 3 timed loops.
+- **18:00 WAT gate:** pass → the demo uses integration; fail → the demo uses `demo-day-v1`.
+- No merges into PR #5's branch or `main`, and no production deploys, until after the demo and Herbert confirms the production branch.
+- Neon claimable DB expires 25 Oct 15:55 WAT (day after the demo): claim it on Friday.
+
 ## Pending
 - **Production branch:** which branch Herbert's Vercel deploys to production (evidence says not PR #5's; Herbert to confirm). Merge hold (ADR-012) stays until then.
 - **Flag lifecycle (ADR-015):** confirm auto-resolve and re-open behaviour.

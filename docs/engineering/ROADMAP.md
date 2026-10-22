@@ -6,7 +6,7 @@ Product rules that hold in every milestone: AI extracts and explains, code calcu
 
 ---
 
-## M0: Demo safety (deadline Fri 23 Oct 2026)
+## M0: Demo safety (Demo Day **Sat 24 Oct 2026**; Friday = controlled integration, ADR-029)
 
 **Rules:** only demo-path changes. Preview/staging only; Okunola promotes. **Option B approved** (ADR-002). **No merges** of the stacked M0 PRs until Okunola confirms Herbert's production branch (ADR-012).
 
