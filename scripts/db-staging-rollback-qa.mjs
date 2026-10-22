@@ -8,8 +8,8 @@ const url=process.env.OPADA_STAGING_DATABASE_URL;
 if(!url||process.env.OPADA_STAGING_TEST_ALLOWED!=='opada-release-staging-20261023')
  throw Error('Explicit staging URL and exact staging opt-in required.');
 const parsed=new URL(url);
-if(!parsed.hostname.endsWith('.neon.tech')||!parsed.hostname.includes('br-silent-thunder-za79z7l8'))
- throw Error('Refusing to run: URL must identify the dedicated staging Neon branch endpoint.');
+if(!parsed.hostname.endsWith('.neon.tech')||!process.env.OPADA_STAGING_ENDPOINT_HOST||parsed.hostname!==process.env.OPADA_STAGING_ENDPOINT_HOST)
+ throw Error('Refusing to run: staging database hostname must match the independently verified staging endpoint.');
 const client=new pg.Client({connectionString:url,ssl:{rejectUnauthorized:true}});
 await client.connect();
 let began=false;
@@ -17,7 +17,7 @@ try{
  await client.query('BEGIN');
  began=true;
  await client.query("SET LOCAL statement_timeout='15s'");
- const businessA=randomUUID(),businessB=randomUUID(),member=randomUUID(),outsider=randomUUID();
+ const businessA=randomUUID(),businessB=randomUUID(),member=randomUUID();
  await client.query('INSERT INTO businesses(id,name) VALUES($1,$2),($3,$4)',[businessA,'OPADA SYNTHETIC ROLLBACK HOTEL',businessB,'OPADA SYNTHETIC ROLLBACK CAFE']);
  await client.query('INSERT INTO staff(id,business_id,role,display_name,auth_subject) VALUES($1,$2,$3,$4,$5)',[member,businessA,'owner','Synthetic owner','rollback-'+randomUUID()]);
  await client.query('SAVEPOINT denied_session');
