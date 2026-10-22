@@ -177,3 +177,11 @@ test('multi-item message keeps line order and one message row', async () => {
   assert.deepEqual(r.entries.map(e => [e.line_no, e.item]), [[1, 'fried rice'], [2, 'jollof rice']]);
   assert.equal(await count(pg, 'SELECT count(*)::int AS n FROM messages'), 1);
 });
+
+test('seed --reset also clears the simulated restaurant\'s messages', async () => {
+  const {pg, send} = await setup();
+  await send('3 fried rice', KEY(11));
+  await seedSimulatedRestaurant({exec: s => pg.exec(s), query: (s, p) => pg.query(s, p)}, {day: '2026-10-23', reset: true});
+  assert.equal(await count(pg, 'SELECT count(*)::int AS n FROM messages'), 0);
+  assert.equal(await count(pg, 'SELECT count(*)::int AS n FROM entries'), 7);
+});
