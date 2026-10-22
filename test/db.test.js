@@ -4,14 +4,14 @@ import {createHash} from 'node:crypto';
 import {mkdtemp, writeFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import path from 'node:path';
-import {PGlite} from '@electric-sql/pglite';
+import {newPglite} from '../db/pglite-for-tests.mjs';
 import {migrate, listMigrations} from '../db/migrate.mjs';
 import {seedSimulatedRestaurant, SIMULATED_BUSINESS_ID, paymentReference} from '../db/seed/simulated-restaurant.mjs';
 import {checkTransfers} from '../src/rules.js';
 
 // In-memory Postgres; no network, no external database.
 async function freshDb() {
-  const pg = new PGlite();
+  const pg = await newPglite();
   return {pg, exec: sql => pg.exec(sql), query: (sql, params) => pg.query(sql, params)};
 }
 const DAY = '2026-10-23';

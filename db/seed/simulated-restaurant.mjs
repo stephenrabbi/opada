@@ -5,7 +5,9 @@
 //   staff-reported transfers   ₦27,200 (fried rice ₦14,400 + amala ₦4,800 + pounded yam transfer part ₦8,000)
 //   Paystack test-mode receipts ₦23,700 (pounded yam transfer arrived as ₦4,500, not ₦8,000)
 //   gap                         ₦3,500  > ₦2,000 transfer threshold
+// and jollof rice costs ₦1,200 in ingredients at a ₦1,500 menu price (20% margin < 35% target).
 import {createHash, randomBytes} from 'node:crypto';
+import {runChecks} from '../../src/checks.js';
 
 export const SIMULATED_BUSINESS_ID = 'a0000000-0000-4000-8000-000000000001';
 // Must keep the 'OPADA SYNTHETIC' prefix: the test-mode Paystack routes only serve businesses named this way.
@@ -35,6 +37,14 @@ export const SIMULATED_ENTRIES = [
   // Incomplete message: saved with needs_review and no price rather than blocking the flow.
   {n: 7, time: '16:45', by: CASHIER, type: 'sale', item: 'jollof rice', quantity: 2, unit: 'plate', unit_price_kobo: null, amount_kobo: null, payment_method: 'unknown', payment_split: null, needs_review: true,
     raw_text: 'Another 2 plate jollof, I no sure of the price'},
+];
+
+// Simulated menu: price and ingredient cost per plate (kobo).
+export const SIMULATED_MENU = [
+  {item: 'jollof rice', price_kobo: 150000, ingredient_costs_kobo: [80000, 25000, 15000]},  // ₦1,200: rice, tomato/pepper base, oil and seasoning
+  {item: 'fried rice', price_kobo: 180000, ingredient_costs_kobo: [70000, 20000]},
+  {item: 'amala and ewedu', price_kobo: 120000, ingredient_costs_kobo: [40000, 20000]},
+  {item: 'pounded yam and egusi', price_kobo: 200000, ingredient_costs_kobo: [60000, 50000]},
 ];
 
 // Simulated Paystack TEST-MODE receipts (as the webhook would store them), each with its expected-reference mapping.
@@ -68,6 +78,7 @@ export async function resetSimulatedRestaurant(db) {
   const id = [SIMULATED_BUSINESS_ID];
   await db.query('DELETE FROM action_audit WHERE business_id = $1', id);
   await db.query('DELETE FROM flags WHERE business_id = $1', id);
+  await db.query('DELETE FROM menu_items WHERE business_id = $1', id);
   await db.query('DELETE FROM payments WHERE business_id = $1', id);
   await db.query('DELETE FROM paystack_expected_references WHERE business_id = $1', id);
   await db.query('DELETE FROM entries WHERE business_id = $1', id);
@@ -87,6 +98,10 @@ export async function seedSimulatedRestaurant(db, {day = lagosToday(), tokenTtlH
     for (const s of SIMULATED_STAFF) {
       await db.query(`INSERT INTO staff (id, business_id, role, display_name, active) VALUES ($1, $2, $3, $4, true)
         ON CONFLICT (id) DO NOTHING`, [s.id, SIMULATED_BUSINESS_ID, s.role, s.display_name]);
+    }
+    for (const m of SIMULATED_MENU) {
+      await db.query(`INSERT INTO menu_items (business_id, item, price_kobo, ingredient_costs_kobo) VALUES ($1, $2, $3, $4::bigint[])
+        ON CONFLICT (business_id, (lower(item))) DO NOTHING`, [SIMULATED_BUSINESS_ID, m.item, m.price_kobo, m.ingredient_costs_kobo]);
     }
     for (const e of SIMULATED_ENTRIES) {
       await db.query(`INSERT INTO entries (id, business_id, type, item, quantity, unit, unit_price_kobo, amount_kobo,
@@ -115,7 +130,9 @@ export async function seedSimulatedRestaurant(db, {day = lagosToday(), tokenTtlH
       tokens[s.display_name] = token;
     }
     await db.exec('COMMIT');
-    return {day, businessId: SIMULATED_BUSINESS_ID, tokens};
+    // Flags come from the rules over the stored data, never from the seed itself.
+    const checks = await runChecks(async (t, p) => (await db.query(t, p)).rows, SIMULATED_BUSINESS_ID, day);
+    return {day, businessId: SIMULATED_BUSINESS_ID, tokens, checks};
   } catch (error) {
     await db.exec('ROLLBACK');
     throw error;
