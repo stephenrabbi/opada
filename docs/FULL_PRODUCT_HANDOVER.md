@@ -252,3 +252,7 @@ Company legal name and ownership, technical lead's GitHub username, exact access
 - Added `GET /api/session` behind **disabled-by-default** `OPADA_SESSION_READ_ENABLED=true`. It returns 404 while disabled, 401 for missing/invalid session when enabled, and only minimal current staff/restaurant identifiers when valid. No raw session secret or hash is exposed.
 - Added `test/session-request.test.js` for cookie parsing and database lookup safeguards.
 - This is NOT a functional sign-in experience: no live session issuance, logout routes, identity provider configuration, CSRF safeguards or customer onboarding. Main Neon/production remains unchanged. Do not enable flag until database migration and full security checks are complete.
+
+## Logout endpoint development — 22 October 2026
+- Added `POST /api/session/logout`, disabled unless `OPADA_SESSION_READ_ENABLED=true` and requiring HTTPS same-origin Origin header. Uses strict session cookie parsing and DB-backed revocation; clears browser cookie on success. Added `test/session-logout.test.js` with origin policy checks.
+- Default production remains disabled; not integrated with working login or frontend. Before enablement, confirm proxy origin handling, add CSRF defense-in-depth, test cookie clearance and revocation on isolated QA database, and verify all session consumers reject revoked tokens. Do not promote this as customer-ready authentication.
