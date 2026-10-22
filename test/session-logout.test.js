@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {originIsAllowed} from '../app/api/session/logout/route.js';
+import {originIsAllowed} from '../src/session-origin.js';
 test('logout requires an HTTPS same-origin request',()=>{
  const request=(url,origin)=>({url,headers:{get:()=>origin}});
  assert.equal(originIsAllowed(request('https://opada.example/logout','https://opada.example')),true);
