@@ -17,7 +17,7 @@ function Evidence({data}) {
       <strong>Staff records ({entries.length})</strong>
       <ul style={{margin: '6px 0 0', paddingLeft: 18, display: 'grid', gap: 6}}>{entries.map(e => <li key={e.id}>
         <span>{lagosTime(e.created_at)} WAT · {e.recorded_by}</span><br/>
-        <span>{e.type}: {e.quantity ?? '?'} {e.unit ?? ''} {e.item} · {naira(e.amount_kobo)} · {e.payment_method}{e.payment_split ? ` (cash ${naira(e.payment_split.cash_kobo)}, transfer ${naira(e.payment_split.transfer_kobo)})` : ''}</span><br/>
+        <span>{e.type}: {e.quantity == null ? '?' : Number(e.quantity)} {e.unit ?? ''} {e.item} · {naira(e.amount_kobo)} · {e.payment_method}{e.payment_split ? ` (cash ${naira(e.payment_split.cash_kobo)}, transfer ${naira(e.payment_split.transfer_kobo)})` : ''}</span><br/>
         <q style={{color: '#46566b'}}>{e.raw_text}</q>
         {e.review_reasons?.length > 0 && <small style={{display: 'block', color: '#7a5600'}}>Needs review: {e.review_reasons.map(r => REVIEW_REASON[r] || r).join(', ')}</small>}
       </li>)}</ul>
