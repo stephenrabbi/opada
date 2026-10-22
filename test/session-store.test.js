@@ -8,8 +8,8 @@ test('session creation is scoped to existing active staff',async()=>{
  const result=await createStaffSession({sql,staff,now:new Date('2026-10-22T14:00:00Z')});
  assert.match(result.secret,/^[A-Za-z0-9_-]{43}$/);
  assert.match(params[0],/^[a-f0-9]{64}$/);
- assert.equal(params[2],staff.id);
- assert.equal(params[3],staff.business_id);
+ assert.equal(params[3],staff.id);
+ assert.equal(params[4],staff.business_id);
  assert.match(statement,/s.active=true/);
 });
 test('revocation and lookup require valid token digests',async()=>{
