@@ -137,3 +137,29 @@ test('staff sessions reject cross-business identities and expired records', asyn
   const revoked=await db.query('SELECT count(*)::int AS n FROM staff_sessions WHERE token_digest=$1 AND revoked_at IS NULL AND expires_at>now()',[digest]);
   assert.equal(revoked.rows[0].n,0);
 });
+
+
+test('database login limiter has a hard ceiling and resets in the next minute', async () => {
+  const db = await freshDb();
+  await migrate(db);
+  const minute='2026-10-22T21:42:00.000Z';
+  // The same atomic upsert used by the login route, tested against real SQL.
+  for (let i=0;i<120;i++) {
+    const result=await db.query(`INSERT INTO login_attempt_buckets(bucket_start,attempts)
+      VALUES($1::timestamptz,1)
+      ON CONFLICT(bucket_start) DO UPDATE
+      SET attempts=login_attempt_buckets.attempts+1
+      WHERE login_attempt_buckets.attempts<$2
+      RETURNING attempts`,[minute,120]);
+    assert.equal(result.rows.length,1);
+    assert.equal(result.rows[0].attempts,i+1);
+  }
+  const blocked=await db.query(`INSERT INTO login_attempt_buckets(bucket_start,attempts)
+    VALUES($1::timestamptz,1)
+    ON CONFLICT(bucket_start) DO UPDATE
+    SET attempts=login_attempt_buckets.attempts+1
+    WHERE login_attempt_buckets.attempts<$2 RETURNING attempts`,[minute,120]);
+  assert.equal(blocked.rows.length,0);
+  const next=await db.query('INSERT INTO login_attempt_buckets(bucket_start,attempts) VALUES($1::timestamptz,1) RETURNING attempts',['2026-10-22T21:43:00.000Z']);
+  assert.equal(next.rows[0].attempts,1);
+});
