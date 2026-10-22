@@ -117,3 +117,23 @@ test('reset only removes the simulated restaurant', async () => {
   assert.equal((await db.query('SELECT count(*)::int AS n FROM businesses')).rows[0].n, 2);
   assert.equal((await db.query('SELECT count(*)::int AS n FROM entries')).rows[0].n, 7);
 });
+
+
+test('staff sessions reject cross-business identities and expired records', async () => {
+  const db = await freshDb();
+  await migrate(db);
+  const a='a0000000-0000-4000-8000-000000000001';
+  const b='b0000000-0000-4000-8000-000000000002';
+  const member='c0000000-0000-4000-8000-000000000003';
+  await db.query('INSERT INTO businesses(id,name) VALUES($1,$2),($3,$4)',[a,'OPADA SYNTHETIC HOTEL (SIMULATED)',b,'OPADA SYNTHETIC RESTAURANT (SIMULATED)']);
+  await db.query('INSERT INTO staff(id,business_id,role,display_name,active,auth_subject) VALUES($1,$2,$3,$4,$5,$6)',[member,a,'owner','Hotel Owner',true,'verified-synthetic-owner']);
+  const digest='a'.repeat(64);
+  await assert.rejects(db.query('INSERT INTO staff_sessions(staff_id,business_id,token_digest,expires_at) VALUES($1,$2,$3,now()+interval \'1 hour\')',[member,b,digest]),/foreign key|violates/i);
+  await db.query('INSERT INTO staff_sessions(staff_id,business_id,token_digest,expires_at) VALUES($1,$2,$3,now()+interval \'1 hour\')',[member,a,digest]);
+  await assert.rejects(db.query('INSERT INTO staff(id,business_id,role,display_name,auth_subject) VALUES($1,$2,$3,$4,$5)', ['d0000000-0000-4000-8000-000000000004',b,'staff','Duplicate', 'verified-synthetic-owner']),/unique|duplicate/i);
+  const active=await db.query('SELECT count(*)::int AS n FROM staff_sessions WHERE token_digest=$1 AND revoked_at IS NULL AND expires_at>now()',[digest]);
+  assert.equal(active.rows[0].n,1);
+  await db.query('UPDATE staff_sessions SET revoked_at=now() WHERE token_digest=$1',[digest]);
+  const revoked=await db.query('SELECT count(*)::int AS n FROM staff_sessions WHERE token_digest=$1 AND revoked_at IS NULL AND expires_at>now()',[digest]);
+  assert.equal(revoked.rows[0].n,0);
+});
