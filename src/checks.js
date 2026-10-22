@@ -102,11 +102,10 @@ const IN_DAY = col => `${col} >= ($2::date::timestamp AT TIME ZONE '${TIMEZONE}'
 
 export async function runChecks(run, businessId, day = lagosDay(), {thresholds = defaultThresholds} = {}) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) throw Error('day must be YYYY-MM-DD');
-  const [entries, payments, menu] = await Promise.all([
-    run(`SELECT id, type, item, amount_kobo, payment_method, payment_split FROM entries WHERE business_id = $1 AND ${IN_DAY('created_at')} ORDER BY created_at`, [businessId, day]),
-    run(`SELECT id, amount_kobo FROM payments WHERE business_id = $1 AND ${IN_DAY('paid_at')} ORDER BY paid_at`, [businessId, day]),
-    run('SELECT id, item, price_kobo, ingredient_costs_kobo FROM menu_items WHERE business_id = $1', [businessId]),
-  ]);
+  // Sequential on purpose: one pg client must not run overlapping queries.
+  const entries = await run(`SELECT id, type, item, amount_kobo, payment_method, payment_split FROM entries WHERE business_id = $1 AND ${IN_DAY('created_at')} ORDER BY created_at`, [businessId, day]);
+  const payments = await run(`SELECT id, amount_kobo FROM payments WHERE business_id = $1 AND ${IN_DAY('paid_at')} ORDER BY paid_at`, [businessId, day]);
+  const menu = await run('SELECT id, item, price_kobo, ingredient_costs_kobo FROM menu_items WHERE business_id = $1', [businessId]);
   const computed = computeDayFlags({day, entries, payments, menu, thresholds});
   const written = [];
   for (const f of computed.flags) {
