@@ -36,3 +36,9 @@ This audit only used read-only metadata and information_schema queries; it did n
 - `staff.auth_subject` already exists and `UNIQUE (business_id,auth_subject)` is already enforced. The pending `0006` migration also adds a *separate* partial uniqueness index on `auth_subject`, which is stricter across all businesses. Review existing (non-sensitive, aggregate) duplicates and identity semantics before applying it.
 - The staff table currently has a primary key on `id`; `0006` proposes a composite unique index on `(id,business_id)` to support tenant-scoped foreign keys.
 - **No migrations have yet been applied to staging.** Validate migration checksums against source first and test DDL only on this isolated branch; do not point production Vercel secrets to it or merge the branch.
+
+## Tenant identity migration correction
+
+The `0006_identity_sessions.sql` release migration now explicitly adds a *tenant-scoped* unique index on `(business_id,auth_subject)`, instead of global identity uniqueness. This is required because the reconstructed `0001_baseline` does not declare the existing production constraint. The new test asserts both allowed cross-business membership and rejected within-business duplicates.
+
+Do not apply these migrations to the real main branch. First confirm the corrected commit's full test suite passes, compare existing migration ledger checksums, and validate on isolated staging.
