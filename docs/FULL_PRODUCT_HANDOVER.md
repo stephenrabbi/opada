@@ -215,3 +215,8 @@ Company legal name and ownership, technical lead's GitHub username, exact access
 - Attempting to create a row with expiry earlier than creation was rejected by `staff_invitation_time_check`. Created valid historical expired and currently revoked synthetic invitation fixtures instead.
 - Ran guarded redemption UPDATE against both expired and revoked fixtures; **zero rows updated** as expected. No production/default DB changes.
 - Remaining before public activation: wrong verified identity and role DB tests, identity provider/session integration, invitation delivery and abuse protection, transaction-level audit logging and independent security review.
+
+## Identity claims foundation — 22 October 2026
+- Added `src/identity-claims.js` pure validation of *already verified* provider claims: issuer, audience, subject, verified email, issued-at and expiration. Added `test/identity-claims.test.js` covering valid and rejected claims.
+- **Critical:** This module does NOT validate JWT cryptographic signatures, JWKS, nonce, token revocation or authentic browser sessions. It must never be used on unverified client-supplied JSON or headers. Provider SDK/server-side signed token validation and secure sessions must be integrated before it is used for live customer registration or invitation redemption.
+- Development branch only. No signup endpoints or production deployment changed.
