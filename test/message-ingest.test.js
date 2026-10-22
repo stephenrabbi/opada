@@ -111,7 +111,12 @@ test('a new transfer entry re-runs the checks for that Lagos day', async () => {
     WHERE business_id=$1 AND rule='transfer_paystack' AND day=$2::date`,[BIZ,day])).rows;
   assert.ok(flag);
   assert.equal(Number(flag.gap),Math.abs(Number(flag.details.signed_gap_kobo)));
-  assert.equal(Number(flag.details.recorded_transfer_kobo),Number(after.total));
+  // Reconciliation includes the transfer component of mixed payments too.
+  const [mixed] = (await pg.query(`SELECT coalesce(sum((payment_split->>'transfer_kobo')::bigint),0)::bigint AS total FROM entries
+    WHERE business_id=$1 AND type='sale' AND payment_method='mixed'
+    AND (created_at AT TIME ZONE 'Africa/Lagos')::date=$2::date
+    AND payment_split ? 'transfer_kobo'`,[BIZ,day])).rows;
+  assert.equal(Number(flag.details.recorded_transfer_kobo),Number(after.total)+Number(mixed.total));
 });
 
 test('Gemini total mismatch is saved (server amount) with the model numbers in the raw data', async () => {
