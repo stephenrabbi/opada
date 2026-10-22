@@ -130,7 +130,9 @@ test('staff sessions reject cross-business identities and expired records', asyn
   const digest='a'.repeat(64);
   await assert.rejects(db.query('INSERT INTO staff_sessions(staff_id,business_id,token_digest,expires_at) VALUES($1,$2,$3,now()+interval \'1 hour\')',[member,b,digest]),/foreign key|violates/i);
   await db.query('INSERT INTO staff_sessions(staff_id,business_id,token_digest,expires_at) VALUES($1,$2,$3,now()+interval \'1 hour\')',[member,a,digest]);
-  await assert.rejects(db.query('INSERT INTO staff(id,business_id,role,display_name,auth_subject) VALUES($1,$2,$3,$4,$5)', ['d0000000-0000-4000-8000-000000000004',b,'staff','Duplicate', 'verified-synthetic-owner']),/unique|duplicate/i);
+  // One verified person may belong to two businesses; subject uniqueness is per tenant.
+  await db.query('INSERT INTO staff(id,business_id,role,display_name,auth_subject) VALUES($1,$2,$3,$4,$5)', ['d0000000-0000-4000-8000-000000000004',b,'staff','Cafe Staff', 'verified-synthetic-owner']);
+  await assert.rejects(db.query('INSERT INTO staff(id,business_id,role,display_name,auth_subject) VALUES($1,$2,$3,$4,$5)', ['e0000000-0000-4000-8000-000000000005',a,'staff','Duplicate hotel identity','verified-synthetic-owner']),/unique|duplicate/i);
   const active=await db.query('SELECT count(*)::int AS n FROM staff_sessions WHERE token_digest=$1 AND revoked_at IS NULL AND expires_at>now()',[digest]);
   assert.equal(active.rows[0].n,1);
   await db.query('UPDATE staff_sessions SET revoked_at=now() WHERE token_digest=$1',[digest]);
