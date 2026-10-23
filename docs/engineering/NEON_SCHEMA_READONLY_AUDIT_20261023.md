@@ -67,3 +67,11 @@ Read-only Neon staging queries verified:
 **Remaining release gates:** independently recalculate the `0008` migration checksum against the exact source bytes, run integration tests through the application against this Neon staging connection with *synthetic identities only*, confirm no external payment operations, obtain co-developer approval, and complete protected production rollout.
 
 Do not interpret the schema inspection alone as live login, token revocation, invite acceptance, or cross-tenant rejection having been exercised on Neon staging. Production remains unchanged.
+
+## Rollback-only live staging constraint test — 23 October 2026
+
+A single PostgreSQL anonymous block on Neon staging `br-silent-thunder-za79z7l8` exercised synthetic same-tenant and cross-tenant staff sessions and invitation inserts. It asserted cross-tenant foreign-key rejection, legitimate session insertion, session revocation, cross-tenant invitation rejection, and same-tenant invitation insertion. The anonymous block used an inner exception/subtransaction to deliberately roll back **all** synthetic inserts on successful completion. The resulting SQL command returned successfully.
+
+Read-only counts immediately before and after remained identical: businesses **4 → 4**, staff **3 → 3**, sessions **1 → 1**, invitations **0 → 0**; zero businesses with the fresh `OPADA SYNTHETIC ROLLBACK` prefix remained. The older synthetic QA businesses and previously revoked session were preserved.
+
+The prior standalone staging script is committed and its code checks passed, but it was **not** the execution mechanism for this database-side anonymous-block test. Application HTTP flows, invitation redemption, external identity authentication, and live payment integration are not covered and remain release gates. Production remained untouched.
