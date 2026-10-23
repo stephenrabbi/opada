@@ -11,6 +11,11 @@ try{
   if(!response?.ok())throw Error(device+': demo route not healthy');
   await page.getByText('SYNTHETIC DATA · DEMONSTRATION ONLY').waitFor();
   await page.getByRole('heading',{name:'Opada interactive demo'}).waitFor();
+  await page.getByRole('link',{name:'Actual owner portal (login required)'}).waitFor();
+  await page.getByRole('link',{name:'Actual staff portal (login required)'}).waitFor();
+  await page.getByRole('button',{name:'Owner dashboard (sample)'}).click();
+  await page.getByRole('button',{name:'Staff workspace (sample)'}).click();
+  await page.getByRole('heading',{name:'Staff workspace — synthetic sales entry'}).waitFor();
   await page.getByRole('combobox',{name:'Choose a demo business'}).selectOption('cafe');
   await page.getByText('Cafe coffee').waitFor();
   if(await page.getByText('Hotel breakfast').count())throw Error(device+': business isolation failed');
