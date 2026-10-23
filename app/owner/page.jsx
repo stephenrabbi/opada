@@ -1,0 +1,78 @@
+'use client';
+import {useEffect,useState} from 'react';
+import FlagsPanel from './FlagsPanel.jsx';
+const money=value=>{const n=Number(value);return Number.isSafeInteger(n)&&n>=0?'₦'+(n/100).toLocaleString('en-NG',{minimumFractionDigits:2,maximumFractionDigits:2}):'Not available'};
+const panel={background:'#fff',padding:20,borderRadius:16,border:'1px solid #dce5ee',marginTop:18};
+export default function Owner(){
+ const [team,setTeam]=useState([]),[teamBusy,setTeamBusy]=useState(false),[teamError,setTeamError]=useState('');
+ const [mobileMenu,setMobileMenu]=useState(false),[view,setView]=useState('overview'),[search,setSearch]=useState(''),[token,setToken]=useState(''),[identity,setIdentity]=useState(null),[receipts,setReceipts]=useState([]),[entries,setEntries]=useState([]),[flags,setFlags]=useState([]),[busy,setBusy]=useState(false),[error,setError]=useState(''),[lastUpdated,setLastUpdated]=useState(null);
+ async function load(){
+  if(!token.trim()){setError('Enter an authorized test account token.');return}
+  setBusy(true);setError('');setIdentity(null);setReceipts([]);setEntries([]);setFlags([]);
+  const headers={Authorization:'Bearer '+token.trim()};
+  try{
+   const who=await fetch('/api/me',{headers,cache:'no-store'});
+   if(who.status===401)throw Error('Test access token is invalid, expired, or no longer authorized. Use a current synthetic owner token.');
+   if(!who.ok)throw Error('Sign-in service temporarily unavailable ('+who.status+').');
+   const i=await who.json();
+   const [paid,issues,submitted]=await Promise.all([fetch('/api/paystack/receipts',{headers,cache:'no-store'}),fetch('/api/flags',{headers,cache:'no-store'}),fetch('/api/entries',{headers,cache:'no-store'})]);
+   if(!paid.ok||!issues.ok||!submitted.ok)throw Error('Authenticated, but some reports are currently unavailable ('+[paid.status,issues.status,submitted.status].join('/')+').');
+   const [p,f,en]=await Promise.all([paid.json(),issues.json(),submitted.json()]);
+   if(!['owner','manager'].includes(i.staff?.role))throw Error('Owner or manager access required.');
+   setIdentity(i);setReceipts(Array.isArray(p.receipts)?p.receipts:[]);setFlags(Array.isArray(f.flags)?f.flags:[]);setEntries(Array.isArray(en.entries)?en.entries:[]);setLastUpdated(new Date());
+  }catch(e){setError(e.message||'Unable to load verified data')}finally{setBusy(false)}
+ }
+ function lock(){setToken('');setIdentity(null);setReceipts([]);setEntries([]);setFlags([]);setTeam([]);setTeamError('');setView('overview');setError('');setLastUpdated(null)}
+ async function openTeam(){
+  if(!identity||!['owner','manager'].includes(identity.staff?.role))return;
+  setView('team');setMobileMenu(false);setTeamBusy(true);setTeamError('');setTeam([]);
+  try{
+   const response=await fetch('/api/team',{headers:{Authorization:'Bearer '+token.trim()},cache:'no-store'});
+   if(response.status===401){lock();setError('Test access expired. Please sign in again.');return}
+   if(!response.ok)throw Error('Team directory is currently unavailable ('+response.status+').');
+   const result=await response.json();
+   if(!Array.isArray(result.team))throw Error('Invalid team response');
+   setTeam(result.team);
+  }catch(e){setTeamError(e.message||'Unable to load team')}finally{setTeamBusy(false)}
+ }
+ function navigate(id){if(id==='team'){openTeam();return}setView(id);setMobileMenu(false)}
+ // Quiet background refresh: new staff messages and Paystack payments show up without pressing Refresh.
+ async function refresh(){
+  const headers={Authorization:'Bearer '+token.trim()};
+  try{
+   const res=await Promise.all(['/api/paystack/receipts','/api/flags','/api/entries'].map(u=>fetch(u,{headers,cache:'no-store'})));
+   if(res.some(r=>r.status===401)){lock();setError('Your test session has ended. Enter the token again.');return}
+   if(res.some(r=>!r.ok))return;
+   const [p,f,en]=await Promise.all(res.map(r=>r.json()));
+   setReceipts(Array.isArray(p.receipts)?p.receipts:[]);setFlags(Array.isArray(f.flags)?f.flags:[]);setEntries(Array.isArray(en.entries)?en.entries:[]);setLastUpdated(new Date());
+  }catch{}
+ }
+ useEffect(()=>{
+  if(!identity)return;
+  const timer=setInterval(()=>{if(document.visibilityState==='visible')refresh()},5000);
+  return()=>clearInterval(timer);
+ },[identity,token]);
+ const filteredEntries=entries.filter(e=>[e.item,e.type,e.payment_method].join(' ').toLowerCase().includes(search.toLowerCase()));
+ const verifiedTotal=receipts.reduce((sum,r)=>sum+Number(r.amount_kobo||0),0);
+ const reviewCount=entries.filter(e=>e.needs_review).length;
+ const input={width:'100%',boxSizing:'border-box',padding:13,border:'1px solid #aebed2',borderRadius:10,fontSize:16};
+ const button={background:'#173967',color:'white',padding:'12px 17px',border:0,borderRadius:10,fontWeight:700,fontSize:15,cursor:'pointer'};
+ return <main className="opada-owner opada-figma-shell" style={{maxWidth:960,margin:'0 auto',padding:'22px 16px 60px'}}>
+  <header style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:10,flexWrap:'wrap'}}><div><a href="/" style={{color:'#173967',textDecoration:'none'}}>← Opada</a><h1 style={{margin:'12px 0 4px',color:'#173967'}}>Owner dashboard</h1><p style={{margin:0,color:'#56667b'}}>Evidence-backed restaurant and hospitality monitoring</p></div><strong style={{background:'#fff2ce',padding:10,borderRadius:10}}>DEVELOPMENT PREVIEW — TEST DATA</strong></header>
+  <aside className="opada-side-nav" aria-label="Main navigation"><div className="opada-brand">opada<span>.</span><small>HOSPITALITY OPERATIONS</small></div><div className="opada-side-items">{[{id:'overview',label:'Overview',icon:'◫'},{id:'transactions',label:'Transactions',icon:'▤'},{id:'payments',label:'Payments',icon:'▣'},{id:'insights',label:'Insights',icon:'◈'},{id:'team',label:'Team',icon:'♙'}].map(t=><button key={t.id} type="button" className={view===t.id?'active':''} disabled={!identity} title={!identity?'Sign in to view business records':t.label} onClick={()=>navigate(t.id)}><span aria-hidden="true">{t.icon}</span>{t.label}</button>)}<a href="/staff">＋ Staff reporting</a></div><small className="opada-side-foot">TEAM STACK-MIND · SYNTHETIC TEST</small></aside>
+  {!identity&&<nav className="opada-login-mobile-links" aria-label="Portal navigation"><a href="/">Home</a><a href="/staff">Staff reporting</a><span>Owner sign-in</span></nav>}
+  {identity&&<nav aria-label="Owner sections" className={"opada-tabs "+(mobileMenu?"opada-tabs-open":"")}>{[{id:"overview",label:"Overview"},{id:"transactions",label:"Transactions"},{id:"payments",label:"Payments"},{id:"insights",label:"Insights"},{id:"team",label:"Team"}].map(t=><button type="button" key={t.id} className={view===t.id?"active":""} onClick={()=>navigate(t.id)} aria-current={view===t.id?"page":undefined}>{t.label}</button>)}</nav>}
+  {!identity?<section style={panel}><h2>Authorized test access</h2><p>Use only a temporary synthetic owner token. It stays only in this page's memory and is cleared by page reload or Lock; never use real client credentials in this preview.</p><label htmlFor="opada-access">Synthetic access token</label><input id="opada-access" style={{...input,margin:'8px 0 12px'}} type="password" autoComplete="off" spellCheck={false} value={token} onChange={e=>setToken(e.target.value)} placeholder="Enter token locally"/><button style={button} onClick={load} disabled={busy}>{busy?'Checking…':'View verified records'}</button>{error&&<p role="alert" style={{color:'#a12424'}}>{error}</p>}</section>:<><section style={{...panel,display:'flex',justifyContent:'space-between',alignItems:'center',gap:12,flexWrap:'wrap'}}><div><b>{identity.restaurant?.name}</b><div style={{color:'#65738b',fontSize:13}}>{identity.staff?.name} · {identity.staff?.role} · Africa/Lagos</div><div className="opada-live" style={{color:'#2f7d4f',fontSize:13,marginTop:4}}>● Live: refreshes every 5 s{lastUpdated?' · updated '+lastUpdated.toLocaleTimeString('en-NG',{timeZone:'Africa/Lagos'})+' WAT':''}</div></div><div style={{display:'flex',gap:8}}><button style={button} disabled={busy} onClick={load}>Refresh</button><button style={{...button,background:'#5c6471'}} onClick={lock}>Lock</button></div></section>
+  {identity&&<div className="opada-mobile-switch"><button type="button" aria-expanded={mobileMenu} onClick={()=>setMobileMenu(!mobileMenu)}>{mobileMenu?"Close navigation":"☰ Sections"}</button><span>{view[0].toUpperCase()+view.slice(1)}</span></div>}
+  {identity&&view==='team'&&<section style={panel} aria-label="Business team"><h2>Business team</h2><p style={{color:'#53657b'}}>Read-only staff directory for this restaurant or hospitality business. Team invitations are not enabled in this preview.</p>{teamBusy?<p role="status">Loading your team…</p>:teamError?<p role="alert" style={{color:'#a12424'}}>{teamError}</p>:team.length?<div className="opada-data-scroller"><table style={{borderCollapse:'collapse',width:'100%',textAlign:'left'}}><thead><tr>{['Staff member','Role','Account'].map(h=><th key={h} style={{padding:10,borderBottom:'1px solid #ccd8e4'}}>{h}</th>)}</tr></thead><tbody>{team.map(person=><tr key={person.id}><td style={{padding:10,borderBottom:'1px solid #e7ebef'}}>{person.display_name}</td><td style={{padding:10,borderBottom:'1px solid #e7ebef'}}>{person.role}</td><td style={{padding:10,borderBottom:'1px solid #e7ebef'}}>{person.active?'Active':'Inactive'}</td></tr>)}</tbody></table></div>:<p>No team members found for this business.</p>}<button type="button" style={button} disabled={teamBusy} onClick={openTeam}>Refresh team</button></section>}
+  {identity&&view==='overview'&&<section className="opada-metrics" aria-label="Restaurant performance snapshot">
+    <article className="opada-metric"><span>Paystack verified</span><strong>{money(verifiedTotal)}</strong><small>{receipts.length} verified test receipts</small></article>
+    <article className="opada-metric"><span>Reports awaiting review</span><strong>{reviewCount}</strong><small>Staff-submitted, not verified sales</small></article>
+    <article className="opada-metric"><span>Open alerts</span><strong>{flags.filter(x=>x.status==='open').length}</strong><small>Evidence-linked, calculated by code</small></article>
+  </section>}
+  {(view==='overview'||view==='payments')&&<section style={panel}><div className="opada-section-heading"><div><span className="opada-overline">PAYMENTS</span><h2 style={{marginTop:4}}>Verified Paystack receipts</h2></div><span className="opada-status-count">{receipts.length} receipts</span></div><p style={{color:'#53657b'}}>Confirmed through Paystack transaction verification. These receipts do not prove that all restaurant transfers have been reconciled.</p><div style={{display:'flex',gap:14,flexWrap:'wrap',margin:'15px 0'}}><div style={{background:'#edf7ed',borderRadius:10,padding:16,minWidth:160}}><small>Verified amount</small><div style={{fontSize:27,fontWeight:800}}>{money(receipts.reduce((s,r)=>s+Number(r.amount_kobo||0),0))}</div></div><div style={{background:'#edf2fa',borderRadius:10,padding:16,minWidth:120}}><small>Receipts shown</small><div style={{fontSize:27,fontWeight:800}}>{receipts.length}</div></div></div>{receipts.length?<><div className="opada-data-scroller"><table style={{borderCollapse:'collapse',width:'100%',fontSize:14,textAlign:'left'}}><thead><tr>{['Date','Reference','Channel','Amount'].map(h=><th key={h} style={{padding:10,borderBottom:'1px solid #ccd8e4'}}>{h}</th>)}</tr></thead><tbody>{receipts.map(r=><tr key={r.paystack_reference}><td style={{padding:10,borderBottom:'1px solid #e7ebef'}}>{new Date(r.paid_at).toLocaleString('en-NG',{timeZone:'Africa/Lagos'})}</td><td style={{padding:10,borderBottom:'1px solid #e7ebef',overflowWrap:'anywhere'}}>{r.paystack_reference}</td><td style={{padding:10,borderBottom:'1px solid #e7ebef'}}><span className="opada-pill opada-pill-neutral">{r.channel}</span></td><td style={{padding:10,borderBottom:'1px solid #e7ebef',fontWeight:700}}>{money(r.amount_kobo)}</td></tr>)}</tbody></table></div><div className="opada-mobile-records">{receipts.map(r=><article className="opada-record-card" key={r.paystack_reference}><div className="opada-record-top"><strong>{money(r.amount_kobo)}</strong><span className="opada-pill opada-pill-green">Verified</span></div><p>Paystack · {r.channel}</p><small>{new Date(r.paid_at).toLocaleString('en-NG',{timeZone:'Africa/Lagos'})}</small><code>{r.paystack_reference}</code></article>)}</div></>:<p>No verified Paystack receipts exist for this account.</p>}</section>}
+  {(view==='overview'||view==='transactions')&&<section style={panel}><div className="opada-section-heading"><div><span className="opada-overline">OPERATIONS</span><h2 style={{marginTop:4}}>Staff-submitted transactions</h2></div><span className="opada-status-count">{entries.length} entries</span></div><p style={{color:'#53657b'}}>These are submitted reports awaiting human review, not Paystack-verified receipts. Do not add their totals to verified payment totals.</p><p><a href="/staff" style={{color:'#173967',fontWeight:700}}>Open staff reporting →</a></p><input aria-label="Filter transactions" placeholder="Search by item, type or payment method" style={{...input,marginBottom:14}} value={search} onChange={e=>setSearch(e.target.value)}/>{filteredEntries.length?<><div className="opada-data-scroller"><table style={{borderCollapse:'collapse',width:'100%',fontSize:14,textAlign:'left'}}><thead><tr>{['Submitted','Type','Item','Amount','Review'].map(h=><th key={h} style={{padding:10,borderBottom:'1px solid #ccd8e4'}}>{h}</th>)}</tr></thead><tbody>{filteredEntries.map(e=><tr key={e.id}><td style={{padding:10,borderBottom:'1px solid #e7ebef'}}>{new Date(e.created_at).toLocaleString('en-NG',{timeZone:'Africa/Lagos'})}</td><td style={{padding:10,borderBottom:'1px solid #e7ebef'}}>{e.type}</td><td style={{padding:10,borderBottom:'1px solid #e7ebef'}}>{e.item}</td><td style={{padding:10,borderBottom:'1px solid #e7ebef'}}>{money(e.amount_kobo)}</td><td style={{padding:10,borderBottom:'1px solid #e7ebef'}}><span className={'opada-pill '+(e.needs_review?'opada-pill-amber':'opada-pill-neutral')}>{e.needs_review?'Needs review':'Submitted'}</span></td></tr>)}</tbody></table></div><div className="opada-mobile-records">{filteredEntries.map(e=><article className="opada-record-card" key={e.id}><div className="opada-record-top"><strong>{e.item}</strong><span className={'opada-pill '+(e.needs_review?'opada-pill-amber':'opada-pill-neutral')}>{e.needs_review?'Needs review':'Submitted'}</span></div><div className="opada-record-top"><span>{e.type}</span><b>{money(e.amount_kobo)}</b></div><small>{new Date(e.created_at).toLocaleString('en-NG',{timeZone:'Africa/Lagos'})} · Staff-reported, unverified</small></article>)}</div></>:<p>No matching staff reports. Try another search or submit a synthetic transaction.</p>}</section>}
+  {(view==='overview'||view==='insights')&&<FlagsPanel flags={flags} token={token.trim()} onChanged={refresh}/>}</>}
+  <footer style={{color:'#64748b',marginTop:24,fontSize:13}}>Opada by Team Stack-Mind · Demo environment · Not authorized for real financial operations.</footer>
+ </main>;
+}

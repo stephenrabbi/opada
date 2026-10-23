@@ -4,18 +4,29 @@
   "private": true,
   "type": "module",
   "engines": {
-    "node": ">=22"
+    "node": ">=22.9"
   },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "node --test",
-    "check": "node --check src/rules.js && node --check src/process.js"
+    "test": "node --test --test-concurrency=2",
+    "check": "node --check src/rules.js && node --check src/process.js && node --check src/ingest-schema.js && node --check src/token-auth.js",
+    "db:migrate": "node --env-file-if-exists=.env.local scripts/db-migrate.mjs",
+    "db:seed": "node --env-file-if-exists=.env.local scripts/db-seed.mjs",
+    "db:preflight": "node --env-file-if-exists=.env.local scripts/db-preflight.mjs",
+    "db:staging-qa": "node --env-file-if-exists=.env.local scripts/db-staging-rollback-qa.mjs"
   },
   "dependencies": {
-    "next": "15.5.9",
+    "@neondatabase/serverless": "1.0.2",
+    "google-auth-library": "^9.15.1",
+    "next": "15.5.28",
     "react": "19.1.2",
-    "react-dom": "19.1.2"
+    "react-dom": "19.1.2",
+    "jose": "^6.1.0"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.11",
+    "pg": "8.23.1"
   }
 }

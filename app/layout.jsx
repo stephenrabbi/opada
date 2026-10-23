@@ -1,1 +1,4 @@
-export const metadata={title:'Opada — Evidence-first business checks',description:'Simulated restaurant reconciliation dashboard'};export default function RootLayout({children}){return <html lang='en'><body style={{margin:0,fontFamily:'Arial, sans-serif',background:'#f3f6fa',color:'#142238'}}>{children}</body></html>}
+import './opada-ui.css';
+import {LegalFooter} from './legal/components.jsx';
+export const metadata={title:'Opada | Restaurant Intelligence',description:'Restaurant-first financial visibility and operational reporting. Development preview uses synthetic data.',robots:{index:false,follow:false}};
+export default function RootLayout({children}){return <html lang="en"><body>{children}<LegalFooter/></body></html>}
