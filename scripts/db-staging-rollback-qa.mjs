@@ -41,6 +41,20 @@ try{
  await client.query("INSERT INTO staff_invitations(business_id,invited_by,invited_email,invited_role,token_digest,expires_at) VALUES($1,$2,$3,$4,$5,now()+interval '1 day')",[businessA,member,'synthetic@example.invalid','staff','d'.repeat(64)]);
  const count=await client.query("SELECT count(*)::int AS n FROM staff_invitations WHERE token_digest=$1",['d'.repeat(64)]);
  assert.equal(count.rows[0].n,1);
+ // Test the same atomic conditional redemption predicate under a rollback-only transaction.
+ const redeem=`UPDATE staff_invitations SET consumed_at=now(),accepted_by=$1
+ WHERE token_digest=$2 AND business_id=$3 AND consumed_at IS NULL
+ AND revoked_at IS NULL AND expires_at>now() RETURNING id`;
+ const wrongTenant=await client.query(redeem,[member,'d'.repeat(64),businessB]);
+ assert.equal(wrongTenant.rowCount,0,'Cross-business invitation redemption must be denied');
+ const first=await client.query(redeem,[member,'d'.repeat(64),businessA]);
+ assert.equal(first.rowCount,1,'Valid invitation must be redeemable');
+ const replay=await client.query(redeem,[member,'d'.repeat(64),businessA]);
+ assert.equal(replay.rowCount,0,'Invitation replay must be denied');
+ await client.query("INSERT INTO staff_invitations(business_id,invited_by,invited_email,invited_role,token_digest,created_at,expires_at) VALUES($1,$2,$3,$4,$5,now()-interval '2 days',now()-interval '1 day')",[businessA,member,'expired@example.invalid','staff','e'.repeat(64)]);
+ assert.equal((await client.query(redeem,[member,'e'.repeat(64),businessA])).rowCount,0,'Expired invitation must be denied');
+ await client.query("INSERT INTO staff_invitations(business_id,invited_by,invited_email,invited_role,token_digest,expires_at,revoked_at) VALUES($1,$2,$3,$4,$5,now()+interval '1 day',now())",[businessA,member,'revoked@example.invalid','staff','f'.repeat(64)]);
+ assert.equal((await client.query(redeem,[member,'f'.repeat(64),businessA])).rowCount,0,'Revoked invitation must be denied');
  console.log('Synthetic tenant sessions, revocation, invitations and isolation checks passed; rolling back.');
 }finally{
  if(began)await client.query('ROLLBACK').catch(()=>{});
