@@ -1,13 +1,13 @@
 'use client';
 import {useEffect,useRef,useState} from 'react';
+import {parseNairaAmounts} from '../../src/voice-amount.js';
 
 const styles={panel:{background:'#fff',borderRadius:16,padding:22,border:'1px solid #dae3ed'},btn:{background:'#173967',color:'white',padding:'12px 16px',border:0,borderRadius:10,fontWeight:700,cursor:'pointer'}};
 const money=n=>'₦'+Number(n).toLocaleString('en-NG');
 function parseReport(text){
   const normalized=text.toLowerCase().replace(/,/g,'');
   // Only numeric amounts explicitly expressed in naira or NGN. Never interpret words as figures.
-  const matches=[...normalized.matchAll(/(?:₦|ngn\s*|(?:naira\s*))\s*(\d+(?:\.\d{1,2})?)/g)];
-  const amounts=matches.map(m=>Number(m[1])).filter(n=>Number.isFinite(n)&&n>0&&n<=10000000);
+  const amounts=parseNairaAmounts(text);
   if(!amounts.length)return {kind:null,amount:null,warning:'No explicit naira amount detected. Enter the amount manually before confirming.'};
   const expense=/\b(spent|expense|cost|bought|purchase|paid for)\b/.test(normalized);
   const sale=/\b(sold|sales|sale|received|collected|earned)\b/.test(normalized);
