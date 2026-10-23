@@ -102,7 +102,18 @@ His auth work is on PR #5's branch (not main). Review and merge plan: MAIN_REVIE
 - No merges into PR #5's branch or `main`, and no production deploys, until after the demo and Herbert confirms the production branch.
 - Neon claimable DB expires 25 Oct 15:55 WAT (day after the demo): claim it on Friday.
 
+## ADR-030: Friday integration is based on Herbert's branch; migration naming is `NNNN_` (2026-10-23, accepted by Okunola)
+`integration/demo-day` is created from Herbert's `integration/hospitality-auth-operations-20261022` @ `7ae86a5` (which already contains `demo-day-v1` and #7–#13, resolves the 3 conflicts as MAIN_REVIEW.md proposed, and keeps his auth disabled). His branch is left untouched. **Migration naming: the `NNNN_name.sql` scheme with our checksummed runner.** Herbert already renamed his migrations to `0006_identity_sessions`, `0007_login_attempt_buckets`, `0008_staff_invitations`; the date-named files are retired. Verified: all 8 apply cleanly through `npm run db:migrate` on an empty database. PRs #14 and #15 are not merged or approved; a comment review was posted on #15.
+
+## ADR-031: Integration preview infrastructure is fully separate (2026-10-23, accepted)
+Vercel project `okun15olas-projects/opada-integration` (alias `opada-integration-okun15ola.vercel.app`, protected) with its own Preview env vars, and its own temporary claimable Neon project `little-frog-05629244` (expires 2026-10-26 07:34 UTC). The working staging project, database and alias are untouched. Integration seed tokens are kept in `.seed-tokens.integration.local.json` (gitignored).
+**Incident:** the first CLI deploy to the new project became its **production** deployment (a new project's first deploy defaults to production), publicly reachable at `opada-integration.vercel.app`. It has **no env vars and no database** (all vars are Preview-only): only public pages and the browser-only `/demo` are visible, and APIs return 401/404/503. Redeployed explicitly with `--target=preview`. **Removing the public alias or deployment awaits Okunola's OK** (deleting Vercel domains or deployments is a guarded action). Lesson: always pass `--target=preview` to `vercel deploy`.
+
+## ADR-032: `/demo` is a verified backup; gate timings need a real-browser method (2026-10-23, accepted)
+Herbert's `/demo` (browser-only simulation) passes his QA script and 3 timed loops at 2.0–3.4 s with zero network calls to APIs. It is a **simulation**, not the real loop. `vercel curl` adds several seconds per call (login + CLI), so it is valid for checking the integration preview works but **not for timing**. For the 18:00 gate, time the real loop either on the protected preview through a Vercel **Protection Bypass for Automation** secret (Okunola enables it; kept out of logs), or locally against the integration database (conservative: Lagos → Frankfurt is slower than Vercel fra1 → Frankfurt).
+
 ## Pending
+- **Public `opada-integration.vercel.app`:** remove the alias or the stray production deployment? (ADR-031)
 - **Production branch:** which branch Herbert's Vercel deploys to production (evidence says not PR #5's; Herbert to confirm). Merge hold (ADR-012) stays until then.
 - **Flag lifecycle (ADR-015):** confirm auto-resolve and re-open behaviour.
 - D2 Incremental TypeScript from M1.
