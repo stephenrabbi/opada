@@ -1,5 +1,5 @@
 'use client';
-import {useMemo,useState} from 'react';
+import {useMemo,useState,useEffect} from 'react';
 
 const initial=[
  {id:1,item:'Hotel breakfast',type:'sale',quantity:8,unitPrice:3500,payment:'transfer',business:'hotel'},
@@ -19,6 +19,9 @@ export default function FunderDemo(){
  const [checked,setChecked]=useState(false);
  const [message,setMessage]=useState('');
  const [tab,setTab]=useState('overview');
+ // Direct sample view links are presentation-only; no authentication or live APIs.
+ function navigateSample(view){setTab(view)}
+ useEffect(()=>{const view=new URLSearchParams(window.location.search).get('view');if(['overview','staff','transactions','alerts'].includes(view))setTab(view)},[]);
  const own=useMemo(()=>transactions.filter(x=>x.business===business),[transactions,business]);
  const total=own.reduce((s,x)=>s+x.quantity*x.unitPrice,0);
  const transfers=own.filter(x=>x.payment==='transfer').reduce((s,x)=>s+x.quantity*x.unitPrice,0);
@@ -38,7 +41,7 @@ export default function FunderDemo(){
     <div><a href="/" style={{color:'#173967'}}>← Opada home</a><h1 style={{fontSize:'clamp(26px,5vw,38px)',margin:'10px 0 4px'}}>Opada interactive demo</h1><p style={{margin:0}}>Hospitality sales, payments and intelligent discrepancy monitoring</p></div>
     <span style={{background:'#fff2ce',padding:12,borderRadius:12,fontWeight:700}}>SYNTHETIC DATA · DEMONSTRATION ONLY</span>
    </header>
-   <nav aria-label="Explore Opada pages" style={{display:'flex',gap:10,flexWrap:'wrap',alignItems:'center'}}><a href="/" style={{...button,textDecoration:'none'}}>Home</a><a href="/owner" style={{...button,textDecoration:'none'}}>Actual owner portal (login required)</a><a href="/staff" style={{...button,textDecoration:'none'}}>Actual staff portal (login required)</a></nav>
+   <nav aria-label="Explore Opada pages" style={{display:'flex',gap:10,flexWrap:'wrap',alignItems:'center'}}><a href="/" style={{...button,textDecoration:'none'}}>Home</a><a href="/demo?view=overview" style={{...button,textDecoration:'none'}} onClick={()=>navigateSample('overview')}>Owner dashboard (sample)</a><a href="/demo?view=staff" style={{...button,textDecoration:'none'}} onClick={()=>navigateSample('staff')}>Staff workspace (sample)</a></nav>
    <section style={{...panel,background:'#eaf3ff'}} aria-label="Demo limitations"><strong>What this demonstrates:</strong> Switch between isolated businesses, add a transaction, view business-specific reports and investigate a simulated payment mismatch. <strong>Not connected to Neon, Paystack, Gemini or customer accounts.</strong> All changes are temporary and reset when you reload the page.</section>
    <section style={panel}><label htmlFor="demo-business" style={{fontWeight:700}}>Choose a demo business</label><select id="demo-business" value={business} onChange={e=>{setBusiness(e.target.value);setChecked(false);setMessage('')}} style={{display:'block',marginTop:8,padding:12,width:'100%',maxWidth:420,borderRadius:9,border:'1px solid #b0bfd1',fontSize:16}}><option value="hotel">Harbour View Hotel · Synthetic account A</option><option value="cafe">Cornerstone Café · Synthetic account B</option></select><p style={{color:'#526278',marginBottom:0}}>Current business: <b>{businessName}</b>. Each demo account sees its own records.</p></section>
    <nav className="opada-funder-tabs" aria-label="Demo sections" style={{display:'flex',gap:10,flexWrap:'wrap'}}>{[['overview','Owner dashboard (sample)'],['staff','Staff workspace (sample)'],['transactions','Transactions'],['alerts','Insights & alerts']].map(([id,label])=><button type="button" key={id} style={{...button,background:tab===id?'#173967':'#dce6f1',color:tab===id?'#fff':'#173967'}} onClick={()=>setTab(id)}>{label}</button>)}</nav>
