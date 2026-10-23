@@ -8,6 +8,8 @@ on:
       - 'scripts/ui-authenticated-qa.mjs'
       - 'scripts/ui-funder-demo-qa.mjs'
       - '.github/workflows/ui-screenshots.yml'
+permissions:
+  contents: read
 jobs:
   capture:
     runs-on: ubuntu-latest
