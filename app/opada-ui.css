@@ -63,10 +63,10 @@
 .opada-home-flag-list article{grid-template-columns:1fr}
 .opada-home-footer{display:block}
 .opada-home-footer p{margin:8px 0}}
-.opada-home-nav a:focus-visible,.opada-staff-sidebar a:focus-visible{outline:3px solid #f4c65a;outline-offset:4px}
+.opada-home-nav a:focus-visible{outline:3px solid #f4c65a;outline-offset:4px}
 .opada-home-footer small{line-height:1.55}
 @media(max-width:540px){.opada-home-hero h1{overflow-wrap:normal;hyphens:auto}}
-@media(prefers-reduced-motion:reduce){.opada-home a,.opada-staff button,.opada-owner button{transition:none!important}}
+@media(prefers-reduced-motion:reduce){.opada-home a{transition:none!important}}
 .opada-home-hero:focus{outline:none}
 .opada-home-nav a:focus-visible,.opada-home-actions a:focus-visible,.opada-home-insights a:focus-visible{outline:3px solid #d39b24!important;outline-offset:4px!important}
 .opada-home-signin{min-height:44px}
