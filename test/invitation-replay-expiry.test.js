@@ -24,7 +24,7 @@ test('invitation redemption is single-use, excludes expired and revoked tokens, 
  const expired=await db.query(`INSERT INTO staff_invitations
  (business_id,invited_by,invited_email,invited_role,token_digest,expires_at)
  VALUES($1,$2,'expired@example.invalid','staff',$3,now()+interval '1 day') RETURNING id`,[business,owner,'b'.repeat(64)]);
- await db.query("UPDATE staff_invitations SET expires_at=now()-interval '1 minute' WHERE id=$1",[expired.rows[0].id]);
+ await db.query("UPDATE staff_invitations SET created_at=now()-interval '2 days',expires_at=now()-interval '1 minute' WHERE id=$1",[expired.rows[0].id]);
  assert.equal((await db.query(redeem,[invitee,expired.rows[0].id,business])).rows.length,0);
  const revoked=await db.query(`INSERT INTO staff_invitations
  (business_id,invited_by,invited_email,invited_role,token_digest,expires_at,revoked_at)
