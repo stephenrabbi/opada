@@ -13,7 +13,7 @@ const wifConfig=()=>({
 });
 function hasWifConfig(){
  const {number,pool,provider,serviceAccount}=wifConfig();
- return /^\\d{6,20}$/.test(number||'')&&/^[a-z][a-z0-9-]{2,31}$/.test(pool)&&/^[a-z][a-z0-9-]{2,31}$/.test(provider)&&/^[a-zA-Z0-9._-]+@[a-z][a-z0-9-]+\\.iam\\.gserviceaccount\\.com$/.test(serviceAccount||'');
+ return /^\d{6,20}$/.test(number||'')&&/^[a-z][a-z0-9-]{2,31}$/.test(pool)&&/^[a-z][a-z0-9-]{2,31}$/.test(provider)&&/^[a-zA-Z0-9._-]+@[a-z][a-z0-9-]+\.iam\.gserviceaccount\.com$/.test(serviceAccount||'');
 }
 async function speechAuthHeaders(request){
  if(process.env.GOOGLE_AUTH_MODE!=='vercel-wif'){
