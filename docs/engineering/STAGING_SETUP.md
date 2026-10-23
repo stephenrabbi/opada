@@ -45,7 +45,15 @@ npx neon@latest claim create --region-id aws-eu-central-1 --file <scratch>/neon.
 | Host | `ep-frosty-queen-bavj0cxi-pooler.c-8.eu-central-1.aws.neon.tech` (pooled; migrations work on it) |
 | **Expires** | **2026-10-25 14:55 UTC (15:55 WAT)**: the project and **all data are deleted** unless claimed |
 
-**To keep it:** `npx neon@latest claim accept crimson-resonance-64310535` opens a URL where you sign in to Neon (free) and take ownership. `npx neon@latest claim status crimson-resonance-64310535` shows the time left. Once claimed, the connection string stays the same. If it lapses: create a new one with the command above, replace `DATABASE_URL`, run `npm run db:migrate && npm run db:seed`.
+**To keep it:** run `npx neon@latest claim accept crimson-resonance-64310535` **on Okunola's laptop** (the claim record only exists there; see `npx neon@latest claim list`). It opens a URL where you sign in to Neon and take ownership. `npx neon@latest claim status crimson-resonance-64310535` shows the time left. After claiming, check: `claim status` says claimed, `npm run db:migrate` says "Up to date", and staging `/api/health` is OK. The connection string is expected to stay the same; if it changes, update `.env.local` and the Vercel Preview `DATABASE_URL` without printing it.
+
+**Which organisation (important):** Okunola's Neon login currently belongs only to **Herbert's organisation**, and creating a personal free organisation asked for a card. On the claim page, **check which organisation the project would land in. Do not accept it into Herbert's organisation** without agreeing with him first. Adding a card is a paid-service step that needs Okunola's own decision.
+
+**If the claim is delayed (Friday plan, ADR-029):** don't wait. Create a **second temporary claimable database** for the integration preview only:
+```sh
+npx neon@latest claim create --region-id aws-eu-central-1 --file <scratch>/neon-integration.env
+```
+Set it as `DATABASE_URL` **only** in the integration preview's env (never in `.env.local` used by the working staging or `demo-day-v1`), then `db:migrate` + `db:seed` against it. It also expires ~72 h after creation. If the claim succeeds instead, create a Neon **branch** named `integration` in the claimed project and point only the integration preview at it. Either way, the working staging database stays untouched.
 
 **Gemini model:** `gemini-2.5-flash` is closed to new API keys (HTTP 404). The default is now `gemini-3.5-flash`, with one automatic retry on `gemini-3.5-flash-lite` when Google is overloaded (429/5xx/timeout). Override with `GEMINI_MODEL` / `GEMINI_FALLBACK_MODEL`.
 
@@ -70,6 +78,19 @@ npm run db:seed -- --reset            # wipe and re-create ONLY the simulated re
 npm run dev
 ```
 Open http://localhost:3000/owner, paste the **owner** token from `.seed-tokens.local.json`, and you should see the seeded entries and three verified test receipts. `/staff` takes a staff token.
+
+## Current staging (set up 22 Oct 2026)
+| | |
+|---|---|
+| Stable URL | **https://opada-staging-okun15ola.vercel.app** (alias; protected by Vercel Authentication, so sign in to Vercel as `okun15ola` to view) |
+| Project | `okun15olas-projects/opada-staging` (Hobby), functions in **fra1** (next to the Neon DB in eu-central-1) |
+| Env (Preview) | `DATABASE_URL`, `GEMINI_API_KEY`, `OPADA_GOOGLE_STT_ENABLED=false`. No Paystack key: the demo uses the seeded test-mode payments, no webhook |
+| Test without a browser | `vercel curl https://opada-staging-okun15ola.vercel.app/api/health --scope okun15olas-projects` (handles the protection) |
+
+**Gotchas found while setting it up:**
+- `vercel link` writes a short-lived `VERCEL_OIDC_TOKEN` into `.env.local` and appends `.vercel` and `.env*` to `.gitignore`. Keep the token (local only). **Revert the `.gitignore` lines**: `.env*` would start ignoring `.env.example`, and the existing rules already cover both.
+- A project made with `vercel project add` has no framework preset; `vercel.json` declares `"framework": "nextjs"` (and `"regions": ["fra1"]`).
+- `vercel deploy` uploads the folder, not the git tree: `.vercelignore` keeps `.env*`, `*.local.json` (seed tokens) and `ui-screenshots/` out.
 
 ## 5. Create the Vercel project and link it
 ```sh
