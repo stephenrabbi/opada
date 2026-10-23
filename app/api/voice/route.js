@@ -20,11 +20,11 @@ async function speechAuthHeaders(request){
   const auth=new GoogleAuth({scopes:['https://www.googleapis.com/auth/cloud-platform']});
   return Object.fromEntries(await auth.getRequestHeaders());
  }
- if(!hasWifConfig())throw Error('Speech identity is not configured');
+ if(!hasWifConfig())throw Error('VOICE_WIF_CONFIG_MISSING');
  // Vercel injects this header into runtime function requests when OIDC is enabled.
  // Never forward user-provided bearer tokens to Google without Google's own STS validation.
  const subjectToken=request.headers.get('x-vercel-oidc-token');
- if(!subjectToken)throw Error('Vercel identity token unavailable');
+ if(!subjectToken)throw Error('VOICE_OIDC_MISSING');
  const {number,pool,provider,serviceAccount}=wifConfig();
  const audience=`//iam.googleapis.com/projects/${number}/locations/global/workloadIdentityPools/${pool}/providers/${provider}`;
  const tokenRes=await fetch('https://sts.googleapis.com/v1/token',{
@@ -32,17 +32,17 @@ async function speechAuthHeaders(request){
   body:JSON.stringify({audience,grantType:'urn:ietf:params:oauth:grant-type:token-exchange',requestedTokenType:'urn:ietf:params:oauth:token-type:access_token',scope:'https://www.googleapis.com/auth/cloud-platform',subjectTokenType:'urn:ietf:params:oauth:token-type:jwt',subjectToken}),
   signal:AbortSignal.timeout(12000)
  });
- if(!tokenRes.ok)throw Error('Federated token exchange failed');
+ if(!tokenRes.ok)throw Error('VOICE_STS_EXCHANGE_FAILED');
  const exchange=await tokenRes.json();
- if(typeof exchange.access_token!=='string')throw Error('Federated access token absent');
+ if(typeof exchange.access_token!=='string')throw Error('VOICE_STS_TOKEN_MISSING');
  const iamRes=await fetch(`https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/${encodeURIComponent(serviceAccount)}:generateAccessToken`,{
   method:'POST',headers:{Authorization:`Bearer ${exchange.access_token}`,'Content-Type':'application/json'},
   body:JSON.stringify({scope:['https://www.googleapis.com/auth/cloud-platform'],lifetime:'900s'}),
   signal:AbortSignal.timeout(12000)
  });
- if(!iamRes.ok)throw Error('Service account impersonation failed');
+ if(!iamRes.ok)throw Error('VOICE_IAM_IMPERSONATION_FAILED');
  const credentials=await iamRes.json();
- if(typeof credentials.accessToken!=='string')throw Error('Service account token absent');
+ if(typeof credentials.accessToken!=='string')throw Error('VOICE_IAM_TOKEN_MISSING');
  return {Authorization:`Bearer ${credentials.accessToken}`};
 }
 function reply(data,status=200){return NextResponse.json(data,{status,headers:{'Cache-Control':'no-store'}})}
@@ -73,5 +73,8 @@ export async function POST(request){
   const transcript=(result.results||[]).map(r=>r.alternatives?.[0]?.transcript||'').join(' ').trim();
   if(!transcript)return reply({error:'No speech recognized. Please try again or type your report.'},422);
   return reply({transcript,language,provider:'google-cloud-speech-v2',verified:false});
- }catch{return reply({error:'Transcription failed. Try browser recognition or typed reporting.'},503)}
+ }catch(e){
+  const code=typeof e?.message==='string'&&/^VOICE_(OIDC|STS|IAM|WIF)_[A-Z_]+$/.test(e.message)?e.message:'VOICE_TRANSCRIPTION_FAILED';
+  return reply({error:'Transcription failed. Try browser recognition or typed reporting.',code},503);
+ }
 }
