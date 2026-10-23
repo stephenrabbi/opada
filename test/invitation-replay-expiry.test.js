@@ -19,6 +19,9 @@ test('invitation redemption is single-use, excludes expired and revoked tokens, 
  const redeem=`UPDATE staff_invitations SET consumed_at=now(),accepted_by=$1
  WHERE id=$2 AND business_id=$3 AND consumed_at IS NULL AND revoked_at IS NULL AND expires_at>now()
  RETURNING id`;
+ const otherBusiness='d0000000-0000-4000-8000-000000000094';
+ await db.query('INSERT INTO businesses(id,name) VALUES($1,$2)',[otherBusiness,'OPADA SYNTHETIC OTHER TENANT']);
+ assert.equal((await db.query(redeem,[invitee,id,otherBusiness])).rows.length,0,'wrong business cannot redeem invitation');
  assert.equal((await db.query(redeem,[invitee,id,business])).rows.length,1);
  assert.equal((await db.query(redeem,[invitee,id,business])).rows.length,0,'replay must not consume twice');
  const expired=await db.query(`INSERT INTO staff_invitations
