@@ -29,3 +29,8 @@
 - **Done:** Read-only GitHub review (Herbert's #14/#15 and integration branch). Comment review on #15. Rollback marked superseded. `integration/demo-day` from `7ae86a5`: 166/166 tests serially (parallel runs crash out of memory on this 8 GB laptop; CI green), build OK, browser journey 8/8, Herbert's `/demo` QA OK + 3 timed `/demo` loops (2.0–3.4 s). Separate Neon DB (8 migrations incl. his 0006–0008) and separate Vercel project; integration preview works end to end via the manual-entry path.
 - **Blocked:** Gemini billing (real-loop timings); a real-browser timing method for the protected preview (ADR-032); decision on the public `opada-integration.vercel.app` (ADR-031).
 - **Next:** 10:00 WAT live-site check; real timed loops after billing; 18:00 gate report; batch push.
+
+## 2026-10-23 (evening)
+- **Done:** 18:00 gate loops (ADR-034); stray integration production deployment and public alias removed; one batched push (integration/demo-day, docs). Live-site check (the 10:00 job didn't run; checked ~17:55): no live-site code pushed, but production now serves the presentation-only release. PR #16 reviewed: scope confirmed (5 files, no network/auth/payments/migrations), 13/13 tests, build, `/demo` QA and homepage journey pass. PR #17 prepared only.
+- **Blocked:** Gemini free-tier 503s (billing deferred); pitch time (for the token schedule); Herbert to confirm what production is running.
+- **Next:** Saturday: fresh pitch tokens on the integration DB, rehearsal, pitch from the integration preview.

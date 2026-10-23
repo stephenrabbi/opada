@@ -112,7 +112,15 @@ Vercel project `okun15olas-projects/opada-integration` (alias `opada-integration
 ## ADR-032: `/demo` is a verified backup; gate timings need a real-browser method (2026-10-23, accepted)
 Herbert's `/demo` (browser-only simulation) passes his QA script and 3 timed loops at 2.0–3.4 s with zero network calls to APIs. It is a **simulation**, not the real loop. `vercel curl` adds several seconds per call (login + CLI), so it is valid for checking the integration preview works but **not for timing**. For the 18:00 gate, time the real loop either on the protected preview through a Vercel **Protection Bypass for Automation** secret (Okunola enables it; kept out of logs), or locally against the integration database (conservative: Lagos → Frankfurt is slower than Vercel fra1 → Frankfurt).
 
+## ADR-033: Pitch runs from our integration preview (2026-10-23, accepted by Okunola)
+Primary: `opada-integration-okun15ola.vercel.app` (protected; Okunola shared a Vercel share link with Herbert privately: never print or commit it). Backup: Herbert's browser-only `/demo`. Last resort: the recorded video. Pitch tokens: fresh synthetic owner/staff tokens on the **integration** database on Saturday morning with a 5 h lifetime (`SEED_TOKEN_TTL_HOURS=5`); its connection string lives in the gitignored `.env.integration.local`.
+
+## ADR-034: 18:00 gate result: integration works; Gemini free tier is the risk (2026-10-23, accepted)
+Real loops (message → entry → flag → one-tap), free tier: preview English 6.8 s, Pidgin 6.1 s, Yoruba failed; local cross-check against the integration DB: Pidgin 9.0 s, Yoruba 7.4 s, English failed. **6 runs: 4 completed (6.1–9.0 s, all far under 60 s); 4 of 6 primary Gemini calls returned HTTP 503; the fallback rescued 2 of 4; 2 messages saved as "failed" (nothing lost).** Herbert's `/demo` backup: 3 loops at 2.0–3.4 s, no network calls.
+
 ## Pending
+- **PR #17 (optional):** Herbert's staging seed: prepared only; nothing runs on his database until Okunola says so. Confirm host = branch `opada-release-staging-20261023` (`br-silent-thunder-za79z7l8`), not main.
+- **Production already serves the presentation-only release** (homepage + `/demo`), although PR #16 says production is held: ask Herbert which deployment and commit is live, and the rollback target.
 - **Production branch:** which branch Herbert's Vercel deploys to production (evidence says not PR #5's; Herbert to confirm). Merge hold (ADR-012) stays until then.
 - **Flag lifecycle (ADR-015):** confirm auto-resolve and re-open behaviour.
 - D2 Incremental TypeScript from M1.
