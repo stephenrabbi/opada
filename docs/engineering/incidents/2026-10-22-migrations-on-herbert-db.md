@@ -1,6 +1,8 @@
 # Incident: our migrations ran on Herbert's Neon database (22 Oct 2026)
 
-**Status:** contained, not rolled back. Rollback script written, **not run** (needs owner approval and Herbert's review).
+**Status:** contained. **Rollback: superseded, pending Herbert's confirmation** (23 Oct). The script is kept for the record and must **not** be run.
+
+**Update 23 Oct 2026:** Herbert's read-only audit (`NEON_SCHEMA_READONLY_AUDIT_20261023.md` on `integration/hospitality-auth-operations-20261022`) confirms our `0001`–`0005` are on his Neon **`main`** branch, and he is **building on them**: he created a fresh staging branch from `main` (`opada-release-staging-20261023`) and applied his `0006`–`0008` there only, leaving `main` otherwise unchanged. Rolling back would now undo the schema his release plan depends on. Okunola decided not to run it (23 Oct); it stays superseded unless Herbert asks otherwise.
 **Severity:** low. Additive and relaxing schema changes only; no data read, changed or deleted; nothing on Herbert's branches breaks (checked 22 Oct evening, see below).
 
 ## What happened
