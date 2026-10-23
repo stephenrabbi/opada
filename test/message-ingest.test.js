@@ -97,10 +97,26 @@ test('message becomes stored entries with the original text, author and review f
 
 test('a new transfer entry re-runs the checks for that Lagos day', async () => {
   const {pg, send} = await setup();
+  const day = new Intl.DateTimeFormat('en-CA', {timeZone: 'Africa/Lagos', year:'numeric', month:'2-digit', day:'2-digit'}).format(new Date());
+  const [before] = (await pg.query(`SELECT coalesce(sum(amount_kobo),0)::bigint AS total FROM entries
+    WHERE business_id=$1 AND type='sale' AND payment_method='transfer'
+    AND (created_at AT TIME ZONE 'Africa/Lagos')::date=$2::date`,[BIZ,day])).rows;
   const r = await send('3 fried rice transfer', KEY(1));
   assert.equal(r.checks.flags_written, 1);
-  const {rows} = await pg.query(`SELECT amount_gap_kobo::text AS gap FROM flags WHERE rule = 'transfer_paystack' AND day = (now() AT TIME ZONE 'Africa/Lagos')::date`);
-  assert.equal(rows[0].gap, '540000');  // today's only transfer, no Paystack payment yet today
+  const [after] = (await pg.query(`SELECT coalesce(sum(amount_kobo),0)::bigint AS total FROM entries
+    WHERE business_id=$1 AND type='sale' AND payment_method='transfer'
+    AND (created_at AT TIME ZONE 'Africa/Lagos')::date=$2::date`,[BIZ,day])).rows;
+  assert.equal(BigInt(after.total)-BigInt(before.total),540000n);
+  const [flag] = (await pg.query(`SELECT amount_gap_kobo::text AS gap,details FROM flags
+    WHERE business_id=$1 AND rule='transfer_paystack' AND day=$2::date`,[BIZ,day])).rows;
+  assert.ok(flag);
+  assert.equal(Number(flag.gap),Math.abs(Number(flag.details.signed_gap_kobo)));
+  // Reconciliation includes the transfer component of mixed payments too.
+  const [mixed] = (await pg.query(`SELECT coalesce(sum((payment_split->>'transfer_kobo')::bigint),0)::bigint AS total FROM entries
+    WHERE business_id=$1 AND type='sale' AND payment_method='mixed'
+    AND (created_at AT TIME ZONE 'Africa/Lagos')::date=$2::date
+    AND payment_split ? 'transfer_kobo'`,[BIZ,day])).rows;
+  assert.equal(Number(flag.details.recorded_transfer_kobo),Number(after.total)+Number(mixed.total));
 });
 
 test('Gemini total mismatch is saved (server amount) with the model numbers in the raw data', async () => {

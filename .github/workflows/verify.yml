@@ -2,6 +2,8 @@ name: Verify Opada rules and app
 on:
   push:
   pull_request:
+permissions:
+  contents: read
 jobs:
   test-and-build:
     runs-on: ubuntu-latest

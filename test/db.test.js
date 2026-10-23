@@ -117,3 +117,72 @@ test('reset only removes the simulated restaurant', async () => {
   assert.equal((await db.query('SELECT count(*)::int AS n FROM businesses')).rows[0].n, 2);
   assert.equal((await db.query('SELECT count(*)::int AS n FROM entries')).rows[0].n, 7);
 });
+
+
+test('staff sessions reject cross-business identities and expired records', async () => {
+  const db = await freshDb();
+  await migrate(db);
+  const a='a0000000-0000-4000-8000-000000000001';
+  const b='b0000000-0000-4000-8000-000000000002';
+  const member='c0000000-0000-4000-8000-000000000003';
+  await db.query('INSERT INTO businesses(id,name) VALUES($1,$2),($3,$4)',[a,'OPADA SYNTHETIC HOTEL (SIMULATED)',b,'OPADA SYNTHETIC RESTAURANT (SIMULATED)']);
+  await db.query('INSERT INTO staff(id,business_id,role,display_name,active,auth_subject) VALUES($1,$2,$3,$4,$5,$6)',[member,a,'owner','Hotel Owner',true,'verified-synthetic-owner']);
+  const digest='a'.repeat(64);
+  await assert.rejects(db.query('INSERT INTO staff_sessions(staff_id,business_id,token_digest,expires_at) VALUES($1,$2,$3,now()+interval \'1 hour\')',[member,b,digest]),/foreign key|violates/i);
+  await db.query('INSERT INTO staff_sessions(staff_id,business_id,token_digest,expires_at) VALUES($1,$2,$3,now()+interval \'1 hour\')',[member,a,digest]);
+  // One verified person may belong to two businesses; subject uniqueness is per tenant.
+  await db.query('INSERT INTO staff(id,business_id,role,display_name,auth_subject) VALUES($1,$2,$3,$4,$5)', ['d0000000-0000-4000-8000-000000000004',b,'staff','Cafe Staff', 'verified-synthetic-owner']);
+  await assert.rejects(db.query('INSERT INTO staff(id,business_id,role,display_name,auth_subject) VALUES($1,$2,$3,$4,$5)', ['e0000000-0000-4000-8000-000000000005',a,'staff','Duplicate hotel identity','verified-synthetic-owner']),/unique|duplicate/i);
+  const active=await db.query('SELECT count(*)::int AS n FROM staff_sessions WHERE token_digest=$1 AND revoked_at IS NULL AND expires_at>now()',[digest]);
+  assert.equal(active.rows[0].n,1);
+  await db.query('UPDATE staff_sessions SET revoked_at=now() WHERE token_digest=$1',[digest]);
+  const revoked=await db.query('SELECT count(*)::int AS n FROM staff_sessions WHERE token_digest=$1 AND revoked_at IS NULL AND expires_at>now()',[digest]);
+  assert.equal(revoked.rows[0].n,0);
+});
+
+
+test('database login limiter has a hard ceiling and resets in the next minute', async () => {
+  const db = await freshDb();
+  await migrate(db);
+  const minute='2026-10-22T21:42:00.000Z';
+  // The same atomic upsert used by the login route, tested against real SQL.
+  for (let i=0;i<120;i++) {
+    const result=await db.query(`INSERT INTO login_attempt_buckets(bucket_start,attempts)
+      VALUES($1::timestamptz,1)
+      ON CONFLICT(bucket_start) DO UPDATE
+      SET attempts=login_attempt_buckets.attempts+1
+      WHERE login_attempt_buckets.attempts<$2
+      RETURNING attempts`,[minute,120]);
+    assert.equal(result.rows.length,1);
+    assert.equal(result.rows[0].attempts,i+1);
+  }
+  const blocked=await db.query(`INSERT INTO login_attempt_buckets(bucket_start,attempts)
+    VALUES($1::timestamptz,1)
+    ON CONFLICT(bucket_start) DO UPDATE
+    SET attempts=login_attempt_buckets.attempts+1
+    WHERE login_attempt_buckets.attempts<$2 RETURNING attempts`,[minute,120]);
+  assert.equal(blocked.rows.length,0);
+  const next=await db.query('INSERT INTO login_attempt_buckets(bucket_start,attempts) VALUES($1::timestamptz,1) RETURNING attempts',['2026-10-22T21:43:00.000Z']);
+  assert.equal(next.rows[0].attempts,1);
+});
+
+
+test('staff invitations refuse an inviter or recipient from another hospitality business',async()=>{
+ const db=await freshDb();await migrate(db);
+ const hotel='a0000000-0000-4000-8000-000000000011';
+ const cafe='b0000000-0000-4000-8000-000000000022';
+ const owner='c0000000-0000-4000-8000-000000000033';
+ const outsider='d0000000-0000-4000-8000-000000000044';
+ await db.query('INSERT INTO businesses(id,name) VALUES($1,$2),($3,$4)',[hotel,'OPADA SYNTHETIC HOTEL (SIMULATED)',cafe,'OPADA SYNTHETIC CAFE (SIMULATED)']);
+ await db.query("INSERT INTO staff(id,business_id,role,display_name) VALUES($1,$2,'owner','Hotel Owner'),($3,$4,'staff','Cafe Staff')",[owner,hotel,outsider,cafe]);
+ const insert=`INSERT INTO staff_invitations(business_id,invited_by,invited_email,invited_role,token_digest,expires_at)
+ VALUES($1,$2,'synthetic@example.test','staff',$3,now()+interval '48 hours') RETURNING id`;
+ await assert.rejects(db.query(insert,[hotel,outsider,'b'.repeat(64)]),/foreign key|violates/i);
+ const created=await db.query(insert,[hotel,owner,'c'.repeat(64)]);
+ assert.equal(created.rows.length,1);
+ await assert.rejects(db.query('UPDATE staff_invitations SET accepted_by=$1,consumed_at=now() WHERE id=$2',[outsider,created.rows[0].id]),/foreign key|violates/i);
+ const stored=await db.query('SELECT consumed_at,accepted_by,business_id FROM staff_invitations WHERE id=$1',[created.rows[0].id]);
+ assert.equal(stored.rows[0].consumed_at,null);
+ assert.equal(stored.rows[0].accepted_by,null);
+ assert.equal(stored.rows[0].business_id,hotel);
+});
