@@ -10,3 +10,11 @@ for(const file of ['verify.yml','ui-screenshots.yml']){
   assert.match(text,/npm ci --no-audit --no-fund/);
  });
 }
+
+test('integration lockfile workflow cannot modify repository contents',async()=>{
+ const text=await readFile(new URL('../.github/workflows/integration-lockfile.yml',import.meta.url),'utf8');
+ assert.match(text,/^permissions:\s*\n\s+contents:\s*read\s*$/m);
+ assert.match(text,/persist-credentials:\s*false/);
+ assert.doesNotMatch(text,/contents:\s*write|git\s+push|git\s+commit|git\s+add\s+package-lock/i);
+ assert.match(text,/git diff --quiet -- package-lock\.json/);
+});
