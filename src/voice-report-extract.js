@@ -19,7 +19,7 @@ function spokenNaira(value){
  return Number.isSafeInteger(amount)&&amount>0&&amount<=1000000?amount:null;
 }
 export function extractReport(text){
- const raw=String(text||'').trim(),s=raw.toLowerCase().replace(/₦/g,' naira ');
+ const raw=String(text||'').trim(),s=raw.toLowerCase().replace(/₦/g,' naira ').replace(/\s+/g,' ');
  const result={fields:{},warnings:[]};
  if(!raw)return {...result,warnings:['Enter or dictate a report first.']};
  // Limited explicitly supported English/Pidgin-style patterns only.
@@ -32,10 +32,11 @@ export function extractReport(text){
   const spoken=s.match(/\\b(?:at|for|price(?:d)?\\s+at)\\s+((?:(?:one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|thousand|and)[ -]+){1,8}?)(?:naira\\s*)?(?:each|per\\s+(?:plate|portion|item))\\b/i);
   if(spoken){const amount=spokenNaira(spoken[1]);if(amount!==null)result.fields.price=String(amount)}
  }
- const cash=/\b(?:cash|kudi)\b/i.test(s),transfer=/\b(?:transfer|bank transfer)\b/i.test(s);
+ const cash=/\b(?:cash|kudi|cash payment|paid cash)\b/i.test(s),transfer=/\b(?:transfer|bank transfer|bank alert|paid by account)\b/i.test(s);
  if(cash&&!transfer)result.fields.payment='cash';
  if(transfer&&!cash)result.fields.payment='transfer';
- if(cash&&transfer)result.warnings.push('Mixed cash and transfer payments detected. The existing form cannot represent a verified payment split; select Unknown and confirm details in the report.');
+ if(cash&&transfer){result.fields.payment='unknown';result.warnings.push('Mixed cash and transfer payments detected. The existing form cannot represent a verified payment split; select Unknown and confirm details in the report.');}
+ if(/\b(?:paid|payment|received)\b/.test(s)&&!cash&&!transfer)result.warnings.push('Payment wording not recognized; choose the payment method manually.');
  if(!result.fields.quantity)result.warnings.push('Quantity not extracted; verify manually.');
  if(!result.fields.price)result.warnings.push('Unit price not extracted; verify manually.');
  if(!result.fields.item)result.warnings.push('Item not extracted; verify manually.');
