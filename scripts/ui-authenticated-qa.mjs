@@ -88,7 +88,7 @@ try{
      await tabTransaction.click();
     }
     await page.getByRole('textbox',{name:'Filter transactions'}).fill('fried');
-    await page.getByText('fried rice').first().waitFor();
+    await page.locator(width<=620?'.opada-record-card:visible':'.opada-data-scroller:visible').getByText('fried rice').first().waitFor();
     await page.getByRole('textbox',{name:'Filter transactions'}).fill('jollof');
     await page.locator(width<=620?'.opada-record-card:visible':'.opada-data-scroller:visible').getByText('Jollof rice').first().waitFor();
    }
