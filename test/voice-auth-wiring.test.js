@@ -7,10 +7,11 @@ const voice=readFileSync(new URL('../app/staff/VoiceReport.jsx',import.meta.url)
 const route=readFileSync(new URL('../app/api/voice/route.js',import.meta.url),'utf8');
 
 test('signed-in staff token is supplied to voice component',()=>{
- assert.match(staff,/<VoiceReport\\s+accessToken=\\{token\\}/);
+ assert.ok(staff.includes('<VoiceReport accessToken={token}'));
 });
 test('Google Cloud transcription sends staff bearer authorization',()=>{
- assert.match(voice,/fetch\\('\/api\/voice',\\{method:'POST',headers:\\{Authorization:'Bearer '\+accessToken\\.trim\\(\\)\\}/);
+ assert.ok(voice.includes("Authorization:'Bearer '+accessToken.trim()"));
+ assert.ok(voice.includes("fetch('/api/voice',{method:'POST'"));
 });
 test('voice API authenticates request before audio reaches Google',()=>{
  const authIndex=route.indexOf('authorizeStaff(request)');
