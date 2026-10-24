@@ -27,14 +27,14 @@ export function extractReport(text){
  if(qty){const n=numberOf(qty[1]);if(n>0&&n<=10000)result.fields.quantity=String(n);const item=qty[2]?.trim();if(item&&item.length>=2)result.fields.item=item}
  // Explicit Nigerian Pidgin-style report; avoid inferring any missing amount.
  if(!result.fields.quantity||!result.fields.item){
-  const pidgin=s.match(/\\b(\\d+|one|two|three|four|five|six|seven|eight|nine|ten)\\s+plates?\\s+(?:of\\s+)?([a-z][a-z -]{1,55}?)\\s+don\\s+comot\\b/i);
+  const pidgin=s.match(/\b(\d+|one|two|three|four|five|six|seven|eight|nine|ten)\s+plates?\s+(?:of\s+)?([a-z][a-z -]{1,55}?)\s+don\s+comot\b/i);
   if(pidgin){const n=numberOf(pidgin[1]);if(n>0&&n<=10000)result.fields.quantity=String(n);const item=pidgin[2].trim();if(item.length>=2)result.fields.item=item}
  }
  const price=s.match(/\b(?:at|for|price(?:d)?\s+at)\s+(?:naira\s*)?(\d{1,3}(?:,\d{3})+|\d{2,7})\s*(?:naira)?\s*(?:each|per\s+(?:plate|portion|item))\b/i)
  ||s.match(/\b(\d{1,3}(?:,\d{3})+|\d{2,7})\s+naira\s+(?:each|per\s+(?:plate|portion|item))\b/i);
  if(price){const amount=numberOf(price[1]);if(amount>0&&amount<=1000000)result.fields.price=String(amount)}
  if(!result.fields.price){
-  const informal=s.match(/\\b(\\d{2,7}|\\d{1,3}(?:,\\d{3})+)\\s*(?:naira)?\\s*each\\b/i);
+  const informal=s.match(/\b(\d{2,7}|\d{1,3}(?:,\d{3})+)\s*(?:naira)?\s*each\b/i);
   if(informal){const n=numberOf(informal[1]);if(n>0&&n<=1000000)result.fields.price=String(n)}
  }
  if(!result.fields.price){
