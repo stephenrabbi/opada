@@ -18,6 +18,7 @@ const browser=await chromium.launch({headless:true});await mkdir('ui-screenshots
 try{
  for(const [device,width,height] of devices){
   const context=await browser.newContext({viewport:{width,height}});
+  const contextEntries={entries:[...entries.entries]};
   await context.route('**/api/**',async route=>{
    const request=route.request();
    const url=new URL(request.url());
@@ -28,7 +29,8 @@ try{
     assert.equal(payload.raw_text,'Synthetic visual QA report');
     assert.match(payload.idempotency_key,/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
     assert.equal(payload.amount_kobo,Math.round(payload.quantity*payload.unit_price_kobo));
-    await route.fulfill({status:201,contentType:'application/json',body:JSON.stringify({entry_id:'mocked-qa-entry'})});return;
+    contextEntries.entries.unshift({id:'mocked-qa-entry',type:payload.type,item:payload.item,amount_kobo:payload.amount_kobo,payment_method:payload.payment_method,needs_review:true,created_at:new Date().toISOString()});
+    await route.fulfill({status:201,contentType:'application/json',body:JSON.stringify({entry_id:'mocked-qa-entry',saved:true,duplicate:false,needs_review:true})});return;
    }
    if(url.pathname==='/api/ingest/message'&&request.method()==='POST'){
     const payload=request.postDataJSON();
@@ -39,7 +41,7 @@ try{
    }
    if(url.pathname==='/api/flags/check'&&request.method()==='POST'){state.checked.add(request.postDataJSON().flag_id);await route.fulfill({status:200,contentType:'application/json',body:'{"checked":true}'});return}
    if(url.pathname.startsWith('/api/flags/')&&url.pathname.endsWith('/evidence')){await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(evidence)});return}
-   const response={'/api/me':identity,'/api/paystack/receipts':receipts,'/api/entries':entries,'/api/flags':flagsNow()}[url.pathname];
+   const response={'/api/me':identity,'/api/paystack/receipts':receipts,'/api/entries':contextEntries,'/api/flags':flagsNow()}[url.pathname];
    await route.fulfill({status:response?200:404,contentType:'application/json',body:JSON.stringify(response||{error:'Unknown fixture'})});
   });
   for(const name of ['staff','owner']){
@@ -63,9 +65,14 @@ try{
    const measures=await page.evaluate(()=>({documentWidth:document.documentElement.scrollWidth,viewport:innerWidth}));
    assert.ok(measures.documentWidth<=measures.viewport+2,`${device} ${name} horizontal overflow ${JSON.stringify(measures)}`);
    if(name==='staff'){
+    await page.getByRole('textbox',{name:'Item',exact:true}).fill('fried rice');
+    await page.getByRole('spinbutton',{name:/Quantity/}).fill('3');
+    await page.getByRole('spinbutton',{name:/Unit price/}).fill('1800');
+    await page.getByLabel('Payment method').selectOption('transfer');
     await page.getByRole('textbox',{name:/Original staff report/}).fill('Synthetic visual QA report');
     await page.getByRole('button',{name:'Save for review'}).click();
-    await page.getByRole('status').getByText(/mocked-qa-entry/).waitFor();
+    await page.getByText('Receipt ID: mocked-qa-entry',{exact:true}).waitFor();
+    await page.getByText('Confirmed in the owner-visible transactions API.').waitFor();
     await page.getByRole('textbox',{name:'Quick message'}).fill('3 plate fried rice, 1800 each, dem transfer am');
     await page.getByRole('button',{name:'Send message'}).click();
     await page.getByText('Saved for owner review:').waitFor();
@@ -80,6 +87,8 @@ try{
      if(!(await tabTransaction.isVisible()))await page.locator('.opada-mobile-switch button').click();
      await tabTransaction.click();
     }
+    await page.getByRole('textbox',{name:'Filter transactions'}).fill('fried');
+    await page.locator(width<=620?'.opada-record-card:visible':'.opada-data-scroller:visible').getByText('fried rice').first().waitFor();
     await page.getByRole('textbox',{name:'Filter transactions'}).fill('jollof');
     await page.locator(width<=620?'.opada-record-card:visible':'.opada-data-scroller:visible').getByText('Jollof rice').first().waitFor();
    }
