@@ -64,7 +64,7 @@ export async function POST(request){
   const bytes=Buffer.from(await audio.arrayBuffer());
   const headers=await speechAuthHeaders(request);
   const googleResponse=await fetch('https://speech.googleapis.com/v2/projects/'+encodeURIComponent(project)+'/locations/'+location+'/recognizers/_:recognize',{
-   method:'POST',headers:{...Object.fromEntries(headers),'Content-Type':'application/json'},
+   method:'POST',headers:{...headers,'Content-Type':'application/json'},
    body:JSON.stringify({config:{autoDecodingConfig:{},languageCodes:[language],model:supported[language]},content:bytes.toString('base64')}),
    signal:AbortSignal.timeout(25000)
   });
