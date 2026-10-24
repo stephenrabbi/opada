@@ -30,3 +30,14 @@ test('no missing price is invented',()=>{
  assert.equal(r.fields.price,undefined);
  assert.ok(r.warnings.some(x=>x.includes('Unit price not extracted')));
 });
+
+test('Pidgin phrasing extracts only explicit quantities and unit price',()=>{
+ const r=extractReport('3 plate fried rice don comot, 1800 each, dem transfer am');
+ assert.deepEqual(r.fields,{quantity:'3',item:'fried rice',price:'1800',payment:'transfer'});
+});
+test('Pidgin phrasing without price does not invent amount',()=>{
+ const r=extractReport('3 plate fried rice don comot, dem transfer am');
+ assert.equal(r.fields.quantity,'3');
+ assert.equal(r.fields.price,undefined);
+ assert.equal(r.fields.payment,'transfer');
+});
