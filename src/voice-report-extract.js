@@ -25,14 +25,23 @@ export function extractReport(text){
  // Limited explicitly supported English/Pidgin-style patterns only.
  const qty=s.match(/\b(?:sold|sell|sale of)\s+(\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|twenty)\s+(?:plates?\s+of\s+|portions?\s+of\s+)?([a-z][a-z -]{1,55}?)(?=\s+(?:at|for|each|per|,|\.|$))/i);
  if(qty){const n=numberOf(qty[1]);if(n>0&&n<=10000)result.fields.quantity=String(n);const item=qty[2]?.trim();if(item&&item.length>=2)result.fields.item=item}
+ // Explicit Nigerian Pidgin-style report; avoid inferring any missing amount.
+ if(!result.fields.quantity||!result.fields.item){
+  const pidgin=s.match(/\\b(\\d+|one|two|three|four|five|six|seven|eight|nine|ten)\\s+plates?\\s+(?:of\\s+)?([a-z][a-z -]{1,55}?)\\s+don\\s+comot\\b/i);
+  if(pidgin){const n=numberOf(pidgin[1]);if(n>0&&n<=10000)result.fields.quantity=String(n);const item=pidgin[2].trim();if(item.length>=2)result.fields.item=item}
+ }
  const price=s.match(/\b(?:at|for|price(?:d)?\s+at)\s+(?:naira\s*)?(\d{1,3}(?:,\d{3})+|\d{2,7})\s*(?:naira)?\s*(?:each|per\s+(?:plate|portion|item))\b/i)
  ||s.match(/\b(\d{1,3}(?:,\d{3})+|\d{2,7})\s+naira\s+(?:each|per\s+(?:plate|portion|item))\b/i);
  if(price){const amount=numberOf(price[1]);if(amount>0&&amount<=1000000)result.fields.price=String(amount)}
  if(!result.fields.price){
+  const informal=s.match(/\\b(\\d{2,7}|\\d{1,3}(?:,\\d{3})+)\\s*(?:naira)?\\s*each\\b/i);
+  if(informal){const n=numberOf(informal[1]);if(n>0&&n<=1000000)result.fields.price=String(n)}
+ }
+ if(!result.fields.price){
   const spoken=s.match(/\b(?:at|for|price(?:d)?\s+at)\s+((?:(?:one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|thousand|and)[ -]+){1,8}?)(?:naira\s*)?(?:each|per\s+(?:plate|portion|item))\b/i);
   if(spoken){const amount=spokenNaira(spoken[1]);if(amount!==null)result.fields.price=String(amount)}
  }
- const cash=/\b(?:cash|kudi|cash payment|paid cash)\b/i.test(s),transfer=/\b(?:transfer|bank transfer|bank alert|paid by account)\b/i.test(s);
+ const cash=/\b(?:cash|kudi|cash payment|paid cash)\b/i.test(s),transfer=/\b(?:transfer|bank transfer|bank alert|paid by account|dem transfer am)\b/i.test(s);
  if(cash&&!transfer)result.fields.payment='cash';
  if(transfer&&!cash)result.fields.payment='transfer';
  if(cash&&transfer){result.fields.payment='unknown';result.warnings.push('Mixed cash and transfer payments detected. The existing form cannot represent a verified payment split; select Unknown and confirm details in the report.');}
