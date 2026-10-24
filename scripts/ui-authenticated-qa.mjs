@@ -28,7 +28,7 @@ try{
     assert.equal(payload.raw_text,'Synthetic visual QA report');
     assert.match(payload.idempotency_key,/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
     assert.equal(payload.amount_kobo,Math.round(payload.quantity*payload.unit_price_kobo));
-    await route.fulfill({status:201,contentType:'application/json',body:JSON.stringify({entry_id:'mocked-qa-entry'})});return;
+    await route.fulfill({status:201,contentType:'application/json',body:JSON.stringify({entry_id:'mocked-qa-entry',saved:true,duplicate:false,needs_review:true})});return;
    }
    if(url.pathname==='/api/ingest/message'&&request.method()==='POST'){
     const payload=request.postDataJSON();
@@ -63,6 +63,10 @@ try{
    const measures=await page.evaluate(()=>({documentWidth:document.documentElement.scrollWidth,viewport:innerWidth}));
    assert.ok(measures.documentWidth<=measures.viewport+2,`${device} ${name} horizontal overflow ${JSON.stringify(measures)}`);
    if(name==='staff'){
+    await page.getByRole('textbox',{name:'Item',exact:true}).fill('fried rice');
+    await page.getByRole('spinbutton',{name:/Quantity/}).fill('3');
+    await page.getByRole('spinbutton',{name:/Unit price/}).fill('1800');
+    await page.getByLabel('Payment method').selectOption('transfer');
     await page.getByRole('textbox',{name:/Original staff report/}).fill('Synthetic visual QA report');
     await page.getByRole('button',{name:'Save for review'}).click();
     await page.getByRole('status').getByText(/mocked-qa-entry/).waitFor();
