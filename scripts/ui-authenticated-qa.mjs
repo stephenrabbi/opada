@@ -69,7 +69,7 @@ try{
     await page.getByLabel('Payment method').selectOption('transfer');
     await page.getByRole('textbox',{name:/Original staff report/}).fill('Synthetic visual QA report');
     await page.getByRole('button',{name:'Save for review'}).click();
-    await page.getByRole('status').getByText(/mocked-qa-entry/).waitFor();
+    await page.getByText('Receipt ID: mocked-qa-entry',{exact:true}).waitFor();
     await page.getByRole('textbox',{name:'Quick message'}).fill('3 plate fried rice, 1800 each, dem transfer am');
     await page.getByRole('button',{name:'Send message'}).click();
     await page.getByText('Saved for owner review:').waitFor();
