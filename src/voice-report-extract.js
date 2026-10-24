@@ -5,7 +5,7 @@ function numberOf(s){const n=Number(s.replace(/,/g,''));return Number.isSafeInte
 const units={zero:0,one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,eighteen:18,nineteen:19};
 const tens={twenty:20,thirty:30,forty:40,fifty:50,sixty:60,seventy:70,eighty:80,ninety:90};
 function spokenNaira(value){
- const words=value.toLowerCase().replace(/-/g,' ').trim().split(/\\s+/);
+ const words=value.toLowerCase().replace(/-/g,' ').trim().split(/\s+/);
  let total=0,current=0;
  for(const word of words){
   if(word==='and')continue;
@@ -29,7 +29,7 @@ export function extractReport(text){
  ||s.match(/\b(\d{1,3}(?:,\d{3})+|\d{2,7})\s+naira\s+(?:each|per\s+(?:plate|portion|item))\b/i);
  if(price){const amount=numberOf(price[1]);if(amount>0&&amount<=1000000)result.fields.price=String(amount)}
  if(!result.fields.price){
-  const spoken=s.match(/\\b(?:at|for|price(?:d)?\\s+at)\\s+((?:(?:one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|thousand|and)[ -]+){1,8}?)(?:naira\\s*)?(?:each|per\\s+(?:plate|portion|item))\\b/i);
+  const spoken=s.match(/\b(?:at|for|price(?:d)?\s+at)\s+((?:(?:one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|thousand|and)[ -]+){1,8}?)(?:naira\s*)?(?:each|per\s+(?:plate|portion|item))\b/i);
   if(spoken){const amount=spokenNaira(spoken[1]);if(amount!==null)result.fields.price=String(amount)}
  }
  const cash=/\b(?:cash|kudi|cash payment|paid cash)\b/i.test(s),transfer=/\b(?:transfer|bank transfer|bank alert|paid by account)\b/i.test(s);
